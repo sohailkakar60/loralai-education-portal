@@ -247,13 +247,12 @@ app.use(
 
 app.listen(
   PORT,
+  "0.0.0.0",
   async () => {
-
     console.log(
-      `Loralai Education Portal API running on http://localhost:${PORT}`
+      `Loralai Education Portal API running on port ${PORT}`
     );
 
     await testDatabaseConnection();
-
   }
 );
