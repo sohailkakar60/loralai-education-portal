@@ -50,9 +50,7 @@ function Institutions({ type }) {
     },
   };
 
-  const current =
-    config[type] || config.school;
-
+  const current = config[type] || config.school;
 
   // =========================================================
   // LOAD INSTITUTIONS
@@ -100,7 +98,6 @@ function Institutions({ type }) {
     loadInstitutions();
   }, [type]);
 
-
   // =========================================================
   // FILTERING
   // =========================================================
@@ -143,7 +140,6 @@ function Institutions({ type }) {
     ownership,
   ]);
 
-
   return (
     <main className="premium-institutions-page">
 
@@ -174,25 +170,20 @@ function Institutions({ type }) {
               </span>
             </div>
 
-
             <div className="premium-page-icon">
               {current.icon}
             </div>
-
 
             <span className="premium-page-eyebrow">
               {current.eyebrow}
             </span>
 
-
             <h1>
               {current.title}
             </h1>
 
-
             <p>
-              {current.description}
-              {" "}
+              {current.description}{" "}
               Find trusted information about
               institutions, locations, students,
               teachers and available educational
@@ -203,7 +194,6 @@ function Institutions({ type }) {
 
         </div>
       </section>
-
 
       {/* =====================================================
           SEARCH / FILTER BAR
@@ -233,7 +223,6 @@ function Institutions({ type }) {
               />
 
             </div>
-
 
             <div className="premium-control-select">
 
@@ -272,7 +261,6 @@ function Institutions({ type }) {
 
             </div>
 
-
             <div className="premium-results-count">
 
               <span>
@@ -288,9 +276,7 @@ function Institutions({ type }) {
           </div>
 
         </div>
-
       </section>
-
 
       {/* =====================================================
           RESULTS
@@ -321,7 +307,6 @@ function Institutions({ type }) {
 
           )}
 
-
           {!loading && error && (
 
             <div className="premium-institutions-state premium-state-error">
@@ -341,7 +326,6 @@ function Institutions({ type }) {
             </div>
 
           )}
-
 
           {!loading &&
             !error &&
@@ -364,8 +348,8 @@ function Institutions({ type }) {
                 </p>
 
               </div>
-            )}
 
+          )}
 
           {!loading &&
             !error &&
@@ -399,8 +383,8 @@ function Institutions({ type }) {
                 </button>
 
               </div>
-            )}
 
+          )}
 
           {!loading &&
             !error &&
@@ -419,8 +403,7 @@ function Institutions({ type }) {
                     </span>
 
                     <h2>
-                      Discover
-                      {" "}
+                      Discover{" "}
                       {current.singular}s
                     </h2>
 
@@ -430,13 +413,11 @@ function Institutions({ type }) {
                     {filteredInstitutions.length}{" "}
                     {filteredInstitutions.length === 1
                       ? current.singular.toLowerCase()
-                      : `${current.singular.toLowerCase()}s`}
-                    {" "}
+                      : `${current.singular.toLowerCase()}s`}{" "}
                     available
                   </p>
 
                 </div>
-
 
                 {/* CARDS */}
 
@@ -482,13 +463,11 @@ function Institutions({ type }) {
 
                           )}
 
-
                           <span className="premium-verified-badge">
                             ✓ Verified
                           </span>
 
                         </Link>
-
 
                         {/* CARD BODY */}
 
@@ -510,7 +489,6 @@ function Institutions({ type }) {
 
                             </span>
 
-
                             {institution.gender_type && (
                               <span className="premium-gender-badge">
                                 {institution.gender_type
@@ -523,11 +501,9 @@ function Institutions({ type }) {
 
                           </div>
 
-
                           <h3>
                             {institution.name}
                           </h3>
-
 
                           <div className="premium-location">
 
@@ -549,14 +525,12 @@ function Institutions({ type }) {
 
                           </div>
 
-
                           <p className="premium-institution-description">
 
                             {institution.description ||
                               `Verified ${current.singular.toLowerCase()} in Loralai.`}
 
                           </p>
-
 
                           {/* STATS */}
 
@@ -575,7 +549,6 @@ function Institutions({ type }) {
 
                             </div>
 
-
                             <div>
 
                               <span>
@@ -588,7 +561,6 @@ function Institutions({ type }) {
                               </strong>
 
                             </div>
-
 
                             <div>
 
@@ -604,7 +576,6 @@ function Institutions({ type }) {
                             </div>
 
                           </div>
-
 
                           {/* ACTION */}
 
@@ -632,12 +603,12 @@ function Institutions({ type }) {
                 </div>
 
               </>
-            )}
+
+          )}
 
         </div>
 
       </section>
-
 
       {/* =====================================================
           BOTTOM CTA
@@ -663,7 +634,6 @@ function Institutions({ type }) {
             </p>
 
           </div>
-
 
           <div className="premium-directory-actions">
 
