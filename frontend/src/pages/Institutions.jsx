@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -10,6 +9,16 @@ function Institutions({ type }) {
   const [ownership, setOwnership] = useState("all");
 
   const config = {
+    school: {
+      title: "Schools in Loralai",
+      eyebrow: "PRIMARY & SECONDARY EDUCATION",
+      description:
+        "Explore verified schools and educational institutions in Loralai.",
+      singular: "School",
+      path: "/schools",
+      icon: "S",
+    },
+
     college: {
       title: "Colleges in Loralai",
       eyebrow: "HIGHER EDUCATION",
@@ -42,7 +51,7 @@ function Institutions({ type }) {
   };
 
   const current =
-    config[type] || config.college;
+    config[type] || config.school;
 
 
   // =========================================================
