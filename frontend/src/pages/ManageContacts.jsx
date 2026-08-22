@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function ManageContacts() {
@@ -55,7 +56,7 @@ function ManageContacts() {
         contactResponse,
       ] = await Promise.all([
         fetch(
-          `http://localhost:5000/api/admin/institutions/${id}`,
+          `${API_URL}/api/admin/institutions/${id}`,
           {
             headers: {
               Authorization:
@@ -65,7 +66,7 @@ function ManageContacts() {
         ),
 
         fetch(
-          `http://localhost:5000/api/contacts/institution/${id}`
+          `${API_URL}/api/contacts/institution/${id}`
         ),
       ]);
 
@@ -196,7 +197,7 @@ function ManageContacts() {
 
         const response =
           await fetch(
-            "http://localhost:5000/api/contacts",
+            `${API_URL}/api/contacts`,
             {
               method: "POST",
 
@@ -305,7 +306,7 @@ function ManageContacts() {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/contacts/${contactId}`,
+            `${API_URL}/api/contacts/${contactId}`,
             {
               method: "DELETE",
 

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Link,
   useNavigate,
   useParams,
@@ -7,6 +7,7 @@ import {
 import { useEffect, useState } from "react";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 const TYPE_CONFIG = {
@@ -105,7 +106,7 @@ function ManageInstitution({ type }) {
 
       const response =
         await fetch(
-          `http://localhost:5000/api/admin/institutions/${id}`,
+          `${API_URL}/api/admin/institutions/${id}`,
           {
             headers: {
               Authorization:
@@ -636,7 +637,7 @@ function ManageInstitution({ type }) {
                         "http"
                       )
                         ? institution.logo_url
-                        : `http://localhost:5000${institution.logo_url}`
+                        : `${API_URL}${institution.logo_url}`
                     }
                     alt={
                       institution.name

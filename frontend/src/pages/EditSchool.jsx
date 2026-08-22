@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 const TYPE_CONFIG = {
@@ -44,6 +45,7 @@ function EditSchool({ type: routeType }) {
 
   const navigate = useNavigate();
 
+
   const [form, setForm] = useState({
     name: "",
     institution_type: "school",
@@ -80,6 +82,7 @@ function EditSchool({ type: routeType }) {
   const [actualType, setActualType] =
     useState(routeType || null);
 
+
   const [loading, setLoading] =
     useState(true);
 
@@ -104,8 +107,11 @@ function EditSchool({ type: routeType }) {
   // =========================================================
 
   useEffect(() => {
+
     const loadInstitution = async () => {
+
       try {
+
         setLoading(true);
         setError("");
 
@@ -114,11 +120,13 @@ function EditSchool({ type: routeType }) {
             "authToken"
           );
 
+
         if (!token) {
           throw new Error(
             "Please login as administrator."
           );
         }
+
 
         if (!id) {
           throw new Error(
@@ -126,9 +134,10 @@ function EditSchool({ type: routeType }) {
           );
         }
 
+
         const response =
           await fetch(
-            `http://localhost:5000/api/admin/institutions/${id}`,
+            `${API_URL}/api/admin/institutions/${id}`,
             {
               headers: {
                 Authorization:
@@ -137,8 +146,10 @@ function EditSchool({ type: routeType }) {
             }
           );
 
+
         const data =
           await response.json();
+
 
         if (
           !response.ok ||
@@ -150,9 +161,11 @@ function EditSchool({ type: routeType }) {
           );
         }
 
+
         const institution =
           data.data?.institution ||
           data.data;
+
 
         if (!institution) {
           throw new Error(
@@ -160,9 +173,11 @@ function EditSchool({ type: routeType }) {
           );
         }
 
+
         const databaseType =
           institution.institution_type ||
           "school";
+
 
         if (
           routeType &&
@@ -178,9 +193,11 @@ function EditSchool({ type: routeType }) {
           );
         }
 
+
         setActualType(
           databaseType
         );
+
 
         setForm({
           name:
@@ -269,22 +286,32 @@ function EditSchool({ type: routeType }) {
             institution.teacher_count ??
             0,
         });
+
+
       } catch (err) {
+
         console.error(
           "Load institution error:",
           err
         );
 
+
         setError(
           err.message ||
             "Failed to load institution."
         );
+
       } finally {
+
         setLoading(false);
+
       }
+
     };
 
+
     loadInstitution();
+
   }, [id, routeType]);
 
 
@@ -295,15 +322,18 @@ function EditSchool({ type: routeType }) {
   const handleChange = (
     event
   ) => {
+
     const {
       name,
       value,
     } = event.target;
 
+
     setForm((previous) => ({
       ...previous,
       [name]: value,
     }));
+
   };
 
 
@@ -313,32 +343,41 @@ function EditSchool({ type: routeType }) {
 
   const handleSubmit =
     async (event) => {
+
       event.preventDefault();
 
       setError("");
       setSuccess("");
 
+
       if (!form.name.trim()) {
         setError(
           `${config.singular} name is required.`
         );
+
         return;
       }
+
 
       if (!form.address.trim()) {
         setError(
           `${config.singular} address is required.`
         );
+
         return;
       }
 
+
       try {
+
         setSaving(true);
+
 
         const token =
           localStorage.getItem(
             "authToken"
           );
+
 
         if (!token) {
           throw new Error(
@@ -492,7 +531,7 @@ function EditSchool({ type: routeType }) {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/admin/institutions/${id}`,
+            `${API_URL}/api/admin/institutions/${id}`,
             {
               method: "PUT",
 
@@ -533,16 +572,21 @@ function EditSchool({ type: routeType }) {
 
 
         setTimeout(() => {
+
           navigate(
             config.adminBase
           );
+
         }, 1000);
 
+
       } catch (err) {
+
         console.error(
           "Update institution error:",
           err
         );
+
 
         setError(
           err.message ||
@@ -550,10 +594,39 @@ function EditSchool({ type: routeType }) {
               config.singular.toLowerCase()
             }.`
         );
+
       } finally {
+
         setSaving(false);
+
       }
+
     };
+
+
+  // =========================================================
+  // IMAGE URL HELPER
+  // =========================================================
+
+  const getImageUrl = (
+    imageUrl
+  ) => {
+
+    if (!imageUrl) {
+      return "";
+    }
+
+    if (
+      imageUrl.startsWith("http://") ||
+      imageUrl.startsWith("https://") ||
+      imageUrl.startsWith("data:") ||
+      imageUrl.startsWith("blob:")
+    ) {
+      return imageUrl;
+    }
+
+    return `${API_URL}${imageUrl}`;
+  };
 
 
   // =========================================================
@@ -872,6 +945,7 @@ function EditSchool({ type: routeType }) {
                     }
                     disabled
                   >
+
                     <option value="school">
                       School
                     </option>
@@ -887,6 +961,7 @@ function EditSchool({ type: routeType }) {
                     <option value="academy">
                       Academy
                     </option>
+
                   </select>
 
                   <small>
@@ -919,6 +994,7 @@ function EditSchool({ type: routeType }) {
                     }
                     onChange={handleChange}
                   >
+
                     <option value="private">
                       Private
                     </option>
@@ -934,6 +1010,7 @@ function EditSchool({ type: routeType }) {
                     <option value="other">
                       Other
                     </option>
+
                   </select>
 
                 </div>
@@ -961,6 +1038,7 @@ function EditSchool({ type: routeType }) {
                     }
                     onChange={handleChange}
                   >
+
                     <option value="not_specified">
                       Not Specified
                     </option>
@@ -976,6 +1054,7 @@ function EditSchool({ type: routeType }) {
                     <option value="co_education">
                       Co-Education
                     </option>
+
                   </select>
 
                 </div>
@@ -1122,7 +1201,9 @@ function EditSchool({ type: routeType }) {
 
                   <input
                     name="phone"
-                    value={form.phone}
+                    value={
+                      form.phone
+                    }
                     onChange={handleChange}
                   />
 
@@ -1145,7 +1226,9 @@ function EditSchool({ type: routeType }) {
                   <input
                     name="email"
                     type="email"
-                    value={form.email}
+                    value={
+                      form.email
+                    }
                     onChange={handleChange}
                   />
 
@@ -1167,7 +1250,9 @@ function EditSchool({ type: routeType }) {
 
                   <input
                     name="website"
-                    value={form.website}
+                    value={
+                      form.website
+                    }
                     onChange={handleChange}
                   />
 
@@ -1236,7 +1321,9 @@ function EditSchool({ type: routeType }) {
                   <textarea
                     name="address"
                     rows="4"
-                    value={form.address}
+                    value={
+                      form.address
+                    }
                     onChange={handleChange}
                     required
                   />
@@ -1252,7 +1339,9 @@ function EditSchool({ type: routeType }) {
 
                   <input
                     name="area"
-                    value={form.area}
+                    value={
+                      form.area
+                    }
                     onChange={handleChange}
                   />
 
@@ -1267,7 +1356,9 @@ function EditSchool({ type: routeType }) {
 
                   <input
                     name="city"
-                    value={form.city}
+                    value={
+                      form.city
+                    }
                     onChange={handleChange}
                   />
 
@@ -1460,6 +1551,7 @@ function EditSchool({ type: routeType }) {
 
               <div className="lep-edit-grid">
 
+
                 <div className="lep-edit-field">
 
                   <label>
@@ -1521,11 +1613,9 @@ function EditSchool({ type: routeType }) {
 
                     <img
                       src={
-                        form.logo_url.startsWith(
-                          "http"
+                        getImageUrl(
+                          form.logo_url
                         )
-                          ? form.logo_url
-                          : `http://localhost:5000${form.logo_url}`
                       }
                       alt="Logo preview"
                       onError={(
@@ -1562,11 +1652,9 @@ function EditSchool({ type: routeType }) {
 
                     <img
                       src={
-                        form.cover_image_url.startsWith(
-                          "http"
+                        getImageUrl(
+                          form.cover_image_url
                         )
-                          ? form.cover_image_url
-                          : `http://localhost:5000${form.cover_image_url}`
                       }
                       alt="Cover preview"
                       onError={(
@@ -2774,6 +2862,10 @@ const pageStyles = `
 
     color:
       #ff9348;
+
+    box-shadow:
+      0 10px 22px
+      rgba(26,54,93,.14);
   }
 
 
@@ -2903,6 +2995,7 @@ const pageStyles = `
     }
 
   }
+
 `;
 
 

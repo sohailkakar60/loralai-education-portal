@@ -1,4 +1,4 @@
-import {
+﻿import {
   Link,
   useNavigate,
   useParams,
@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 const TYPE_CONFIG = {
@@ -121,7 +122,7 @@ function ManagePrograms({ type }) {
 
       const institutionResponse =
         await fetch(
-          `http://localhost:5000/api/admin/institutions/${id}`,
+          `${API_URL}/api/admin/institutions/${id}`,
           {
             headers: {
               Authorization:
@@ -176,7 +177,7 @@ function ManagePrograms({ type }) {
       // existing backend API.
       const programsResponse =
         await fetch(
-          `http://localhost:5000/api/programs/institution/${id}`
+          `${API_URL}/api/programs/institution/${id}`
         );
 
 
@@ -390,7 +391,7 @@ function ManagePrograms({ type }) {
 
           response =
             await fetch(
-              "http://localhost:5000/api/programs",
+              `${API_URL}/api/programs`,
               {
                 method: "POST",
 
@@ -421,7 +422,7 @@ function ManagePrograms({ type }) {
 
           response =
             await fetch(
-              `http://localhost:5000/api/programs/${editingId}`,
+              `${API_URL}/api/programs/${editingId}`,
               {
                 method: "PUT",
 
@@ -503,7 +504,7 @@ function ManagePrograms({ type }) {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/programs/institution/${id}`
+            `${API_URL}/api/programs/institution/${id}`
           );
 
 
@@ -579,7 +580,7 @@ function ManagePrograms({ type }) {
 
       const response =
         await fetch(
-          `http://localhost:5000/api/programs/${program.id}`,
+          `${API_URL}/api/programs/${program.id}`,
           {
             method: "DELETE",
 

@@ -1,85 +1,207 @@
 import ReviewForm from "../components/ReviewForm";
 import ReviewsSection from "../components/ReviewsSection";
+
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import {
+  Link,
+  useParams,
+} from "react-router-dom";
+
+import API_URL from "../config/api";
+
 
 function SchoolDetails() {
   const { slug } = useParams();
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+
+  const [data, setData] =
+    useState(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+
+  // =========================================================
+  // LOAD SCHOOL
+  // =========================================================
 
   useEffect(() => {
-    const loadSchool = async () => {
-      try {
-        setLoading(true);
-        setError("");
 
-        const response = await fetch(
-          `http://localhost:5000/api/public/institutions/${slug}`
-        );
+    const loadSchool =
+      async () => {
 
-        const result = await response.json();
+        try {
 
-        if (!response.ok || !result.success) {
-          throw new Error(
-            result.message ||
+          setLoading(true);
+          setError("");
+
+
+          if (!slug) {
+
+            throw new Error(
+              "School slug is missing."
+            );
+
+          }
+
+
+          const response =
+            await fetch(
+              `${API_URL}/api/public/institutions/${slug}`
+            );
+
+
+          const result =
+            await response.json();
+
+
+          if (
+            !response.ok ||
+            !result.success
+          ) {
+
+            throw new Error(
+              result.message ||
+                "Failed to load school."
+            );
+
+          }
+
+
+          setData(
+            result.data
+          );
+
+
+        } catch (err) {
+
+          console.error(
+            "Load school error:",
+            err
+          );
+
+
+          setError(
+            err.message ||
               "Failed to load school."
           );
+
+
+        } finally {
+
+          setLoading(false);
+
         }
 
-        setData(result.data);
-      } catch (err) {
-        console.error(err);
+      };
 
-        setError(
-          err.message ||
-            "Failed to load school."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
 
     loadSchool();
+
   }, [slug]);
 
+
+  // =========================================================
+  // IMAGE URL HELPER
+  // =========================================================
+
+  const getImageUrl =
+    (imageUrl) => {
+
+      if (!imageUrl) {
+        return "";
+      }
+
+
+      if (
+        imageUrl.startsWith(
+          "http://"
+        ) ||
+        imageUrl.startsWith(
+          "https://"
+        ) ||
+        imageUrl.startsWith(
+          "data:"
+        ) ||
+        imageUrl.startsWith(
+          "blob:"
+        )
+      ) {
+        return imageUrl;
+      }
+
+
+      return `${API_URL}${imageUrl}`;
+
+    };
+
+
+  // =========================================================
+  // LOADING
+  // =========================================================
+
   if (loading) {
+
     return (
       <main className="school-details-page">
+
         <div className="container">
+
           <div className="page-heading">
+
             <span className="official-label">
               LORALAI EDUCATION PORTAL
             </span>
+
 
             <h1>
               Loading School...
             </h1>
+
           </div>
+
         </div>
+
       </main>
     );
+
   }
 
-  if (error || !data) {
+
+  // =========================================================
+  // ERROR
+  // =========================================================
+
+  if (
+    error ||
+    !data
+  ) {
+
     return (
       <main className="school-details-page">
+
         <div className="container">
+
           <div className="school-details-error">
+
             <span className="official-label">
               LORALAI EDUCATION PORTAL
             </span>
+
 
             <h1>
               School Not Found
             </h1>
 
+
             <p>
               {error ||
                 "The requested school could not be found."}
             </p>
+
 
             <Link
               to="/schools"
@@ -87,11 +209,16 @@ function SchoolDetails() {
             >
               ← Back to Schools
             </Link>
+
           </div>
+
         </div>
+
       </main>
     );
+
   }
+
 
   const {
     institution,
@@ -103,8 +230,14 @@ function SchoolDetails() {
     admissions = [],
   } = data;
 
+
   return (
     <main className="school-details-page">
+
+
+      {/* =====================================================
+          HERO
+      ===================================================== */}
 
       <section className="school-details-hero">
 
@@ -117,38 +250,68 @@ function SchoolDetails() {
             ← Back to Schools
           </Link>
 
+
           <div className="school-details-heading">
 
+
+            {/* LOGO */}
+
             <div className="school-details-logo">
+
               {institution.logo_url ? (
+
                 <img
-                  src={`http://localhost:5000${institution.logo_url}`}
-                  alt={institution.name}
+                  src={
+                    getImageUrl(
+                      institution.logo_url
+                    )
+                  }
+                  alt={
+                    institution.name
+                  }
+                  onError={(event) => {
+                    event.currentTarget.style.display =
+                      "none";
+                  }}
                 />
+
               ) : (
+
                 institution.name
                   ?.charAt(0)
-                  ?.toUpperCase() || "S"
+                  ?.toUpperCase() ||
+                "S"
+
               )}
+
             </div>
+
+
+            {/* TITLE */}
 
             <div>
 
               <span className="school-profile-verified-badge">
-  ✓ Verified Institution
-</span>
+                ✓ Verified Institution
+              </span>
+
 
               <h1>
                 {institution.name}
               </h1>
 
+
               <p>
                 📍{" "}
+
                 {institution.area
                   ? `${institution.area}, `
                   : ""}
+
                 {institution.city},{" "}
+
                 {institution.district}
+
               </p>
 
             </div>
@@ -160,13 +323,23 @@ function SchoolDetails() {
       </section>
 
 
+      {/* =====================================================
+          CONTENT
+      ===================================================== */}
+
       <section className="school-details-content">
 
         <div className="container">
 
           <div className="school-details-layout">
 
+
+            {/* =================================================
+                MAIN
+            ================================================= */}
+
             <div className="school-details-main">
+
 
               {/* ABOUT */}
 
@@ -176,9 +349,11 @@ function SchoolDetails() {
                   ABOUT
                 </span>
 
+
                 <h2>
                   About the Institution
                 </h2>
+
 
                 <p>
                   {institution.description ||
@@ -196,13 +371,17 @@ function SchoolDetails() {
                   OVERVIEW
                 </span>
 
+
                 <h2>
                   School Information
                 </h2>
 
+
                 <div className="detail-grid">
 
+
                   <div>
+
                     <span>
                       Ownership
                     </span>
@@ -211,9 +390,12 @@ function SchoolDetails() {
                       {institution.ownership_type ||
                         "Not listed"}
                     </strong>
+
                   </div>
 
+
                   <div>
+
                     <span>
                       Gender Type
                     </span>
@@ -222,9 +404,12 @@ function SchoolDetails() {
                       {institution.gender_type ||
                         "Not listed"}
                     </strong>
+
                   </div>
 
+
                   <div>
+
                     <span>
                       Principal
                     </span>
@@ -233,9 +418,12 @@ function SchoolDetails() {
                       {institution.principal_name ||
                         "Not listed"}
                     </strong>
+
                   </div>
 
+
                   <div>
+
                     <span>
                       Established
                     </span>
@@ -244,26 +432,35 @@ function SchoolDetails() {
                       {institution.established_year ||
                         "Not listed"}
                     </strong>
+
                   </div>
 
+
                   <div>
+
                     <span>
                       Students
                     </span>
 
                     <strong>
-                      {institution.student_count ?? 0}
+                      {institution.student_count ??
+                        0}
                     </strong>
+
                   </div>
 
+
                   <div>
+
                     <span>
                       Teachers
                     </span>
 
                     <strong>
-                      {institution.teacher_count ?? 0}
+                      {institution.teacher_count ??
+                        0}
                     </strong>
+
                   </div>
 
                 </div>
@@ -279,34 +476,49 @@ function SchoolDetails() {
                   ACADEMICS
                 </span>
 
+
                 <h2>
                   Academic Programs
                 </h2>
 
+
                 {programs.length === 0 ? (
+
                   <p>
                     No academic programs available.
                   </p>
+
                 ) : (
+
                   <div className="detail-list">
 
-                    {programs.map((program) => (
-                      <div
-                        key={program.id}
-                        className="detail-list-item"
-                      >
-                        <strong>
-                          {program.name}
-                        </strong>
+                    {programs.map(
+                      (program) => (
 
-                        <span>
-                          {program.level ||
-                            "Program"}
-                        </span>
-                      </div>
-                    ))}
+                        <div
+                          key={
+                            program.id
+                          }
+                          className="detail-list-item"
+                        >
+
+                          <strong>
+                            {program.name}
+                          </strong>
+
+
+                          <span>
+                            {program.level ||
+                              "Program"}
+                          </span>
+
+                        </div>
+
+                      )
+                    )}
 
                   </div>
+
                 )}
 
               </section>
@@ -320,55 +532,88 @@ function SchoolDetails() {
                   FACULTY
                 </span>
 
+
                 <h2>
                   Teachers
                 </h2>
 
+
                 {teachers.length === 0 ? (
+
                   <p>
                     No teacher information available.
                   </p>
+
                 ) : (
+
                   <div className="teacher-grid">
 
-                    {teachers.map((teacher) => (
-                      <div
-                        key={teacher.id}
-                        className="teacher-public-card"
-                      >
+                    {teachers.map(
+                      (teacher) => (
 
-                        <div className="teacher-public-avatar">
-                          {teacher.profile_photo_url ? (
-                            <img
-                              src={`http://localhost:5000${teacher.profile_photo_url}`}
-                              alt={teacher.full_name}
-                            />
-                          ) : (
-                            teacher.full_name
-                              ?.charAt(0)
-                              ?.toUpperCase() || "T"
-                          )}
+                        <div
+                          key={
+                            teacher.id
+                          }
+                          className="teacher-public-card"
+                        >
+
+
+                          <div className="teacher-public-avatar">
+
+                            {teacher.profile_photo_url ? (
+
+                              <img
+                                src={
+                                  getImageUrl(
+                                    teacher.profile_photo_url
+                                  )
+                                }
+                                alt={
+                                  teacher.full_name
+                                }
+                                onError={(event) => {
+                                  event.currentTarget.style.display =
+                                    "none";
+                                }}
+                              />
+
+                            ) : (
+
+                              teacher.full_name
+                                ?.charAt(0)
+                                ?.toUpperCase() ||
+                              "T"
+
+                            )}
+
+                          </div>
+
+
+                          <h3>
+                            {teacher.full_name}
+                          </h3>
+
+
+                          <p>
+                            {teacher.qualification ||
+                              "Qualification not listed"}
+                          </p>
+
+
+                          <span>
+                            {teacher.subject ||
+                              teacher.specialization ||
+                              "Teacher"}
+                          </span>
+
                         </div>
 
-                        <h3>
-                          {teacher.full_name}
-                        </h3>
-
-                        <p>
-                          {teacher.qualification ||
-                            "Qualification not listed"}
-                        </p>
-
-                        <span>
-                          {teacher.subject ||
-                            teacher.specialization ||
-                            "Teacher"}
-                        </span>
-
-                      </div>
-                    ))}
+                      )
+                    )}
 
                   </div>
+
                 )}
 
               </section>
@@ -382,28 +627,42 @@ function SchoolDetails() {
                   FACILITIES
                 </span>
 
+
                 <h2>
                   Facilities
                 </h2>
 
+
                 {facilities.length === 0 ? (
+
                   <p>
                     No facilities available.
                   </p>
+
                 ) : (
+
                   <div className="facility-public-list">
 
-                    {facilities.map((facility) => (
-                      <div
-                        key={facility.id}
-                        className="facility-public-item"
-                      >
-                        ✓{" "}
-                        {facility.facility_name}
-                      </div>
-                    ))}
+                    {facilities.map(
+                      (facility) => (
+
+                        <div
+                          key={
+                            facility.id
+                          }
+                          className="facility-public-item"
+                        >
+
+                          ✓{" "}
+                          {facility.facility_name}
+
+                        </div>
+
+                      )
+                    )}
 
                   </div>
+
                 )}
 
               </section>
@@ -417,107 +676,151 @@ function SchoolDetails() {
                   FEES
                 </span>
 
+
                 <h2>
                   Fee Information
                 </h2>
 
+
                 {fees.length === 0 ? (
+
                   <p>
                     No public fee information available.
                   </p>
+
                 ) : (
+
                   <div className="detail-list">
 
-                    {fees.map((fee) => (
-                      <div
-                        key={fee.id}
-                        className="detail-list-item"
-                      >
-                        <div>
+                    {fees.map(
+                      (fee) => (
+
+                        <div
+                          key={
+                            fee.id
+                          }
+                          className="detail-list-item"
+                        >
+
+                          <div>
+
+                            <strong>
+                              {fee.fee_name}
+                            </strong>
+
+
+                            <span>
+                              {fee.class_name ||
+                                "All Classes"}
+                            </span>
+
+                          </div>
+
 
                           <strong>
-                            {fee.fee_name}
-                          </strong>
+                            Rs.{" "}
 
-                          <span>
-                            {fee.class_name ||
-                              "All Classes"}
-                          </span>
+                            {Number(
+                              fee.amount || 0
+                            ).toLocaleString()}
+
+                          </strong>
 
                         </div>
 
-                        <strong>
-                          Rs.{" "}
-                          {Number(
-                            fee.amount || 0
-                          ).toLocaleString()}
-                        </strong>
-
-                      </div>
-                    ))}
+                      )
+                    )}
 
                   </div>
+
                 )}
 
               </section>
 
 
-              {/* ADMISSIONS */}
+              {/* ADMISSIONS / REVIEWS */}
 
               <section className="detail-card">
-                
+
+
                 <ReviewsSection
-  institutionId={institution.id}
-/>
-<ReviewForm
-  institutionId={institution.id}
-/>
+                  institutionId={
+                    institution.id
+                  }
+                />
+
+
+                <ReviewForm
+                  institutionId={
+                    institution.id
+                  }
+                />
+
+
                 <span className="detail-label">
                   ADMISSIONS
                 </span>
+
 
                 <h2>
                   Admissions
                 </h2>
 
+
                 {admissions.length === 0 ? (
+
                   <p>
                     No admission information available.
                   </p>
+
                 ) : (
+
                   <div className="admission-list">
 
-                    {admissions.map((admission) => (
-                      <div
-                        key={admission.id}
-                        className="admission-card"
-                      >
+                    {admissions.map(
+                      (admission) => (
 
-                        <div>
+                        <div
+                          key={
+                            admission.id
+                          }
+                          className="admission-card"
+                        >
 
-                          <strong>
-                            {admission.title}
-                          </strong>
+                          <div>
 
-                          <p>
-                            {admission.description ||
-                              "No description available."}
-                          </p>
+                            <strong>
+                              {admission.title}
+                            </strong>
+
+
+                            <p>
+                              {admission.description ||
+                                "No description available."}
+                            </p>
+
+                          </div>
+
+
+                          <span
+                            className={
+                              `admission-status ${admission.admission_status}`
+                            }
+                          >
+
+                            {
+                              admission.admission_status
+                            }
+
+                          </span>
 
                         </div>
 
-                        <span
-                          className={
-                            `admission-status ${admission.admission_status}`
-                          }
-                        >
-                          {admission.admission_status}
-                        </span>
-
-                      </div>
-                    ))}
+                      )
+                    )}
 
                   </div>
+
                 )}
 
               </section>
@@ -525,9 +828,14 @@ function SchoolDetails() {
             </div>
 
 
-            {/* SIDEBAR */}
+            {/* =================================================
+                SIDEBAR
+            ================================================= */}
 
             <aside className="school-details-sidebar">
+
+
+              {/* LOCATION */}
 
               <div className="sidebar-card">
 
@@ -535,18 +843,23 @@ function SchoolDetails() {
                   LOCATION
                 </span>
 
+
                 <h3>
                   Address
                 </h3>
+
 
                 <p>
                   {institution.address}
                 </p>
 
+
                 <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                    `${institution.address}, ${institution.city}, ${institution.district}`
-                  )}`}
+                  href={
+                    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      `${institution.address}, ${institution.city}, ${institution.district}`
+                    )}`
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   className="map-link"
@@ -557,59 +870,96 @@ function SchoolDetails() {
               </div>
 
 
+              {/* CONTACT */}
+
               <div className="sidebar-card">
 
                 <span className="detail-label">
                   CONTACT
                 </span>
 
+
                 <h3>
                   Contact Information
                 </h3>
 
-                {contacts.length > 0 ? (
-                  contacts.map((contact) => (
-                    <div
-                      key={contact.id}
-                      className="contact-public-item"
-                    >
-                      <span>
-                        {contact.contact_type}
-                      </span>
 
-                      <strong>
-                        {contact.contact_value}
-                      </strong>
-                    </div>
-                  ))
+                {contacts.length > 0 ? (
+
+                  contacts.map(
+                    (contact) => (
+
+                      <div
+                        key={
+                          contact.id
+                        }
+                        className="contact-public-item"
+                      >
+
+                        <span>
+                          {contact.contact_type}
+                        </span>
+
+
+                        <strong>
+                          {contact.contact_value}
+                        </strong>
+
+                      </div>
+
+                    )
+                  )
+
                 ) : (
+
                   <>
+
                     {institution.phone && (
+
                       <div className="contact-public-item">
-                        <span>Phone</span>
+
+                        <span>
+                          Phone
+                        </span>
+
                         <strong>
                           {institution.phone}
                         </strong>
+
                       </div>
+
                     )}
 
+
                     {institution.email && (
+
                       <div className="contact-public-item">
-                        <span>Email</span>
+
+                        <span>
+                          Email
+                        </span>
+
                         <strong>
                           {institution.email}
                         </strong>
+
                       </div>
+
                     )}
+
 
                     {!institution.phone &&
                       !institution.email && (
+
                         <p>
                           No public contact
                           information.
                         </p>
+
                       )}
+
                   </>
+
                 )}
 
               </div>
@@ -625,5 +975,6 @@ function SchoolDetails() {
     </main>
   );
 }
+
 
 export default SchoolDetails;

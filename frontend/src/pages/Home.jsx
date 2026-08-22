@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function Home() {
@@ -42,15 +43,15 @@ function Home() {
           newsResponse,
         ] = await Promise.all([
           fetch(
-            "http://localhost:5000/api/public/institutions?type=school&limit=6"
+            `${API_URL}/api/public/institutions?type=school&limit=6`
           ),
 
           fetch(
-            "http://localhost:5000/api/public/stats"
+            `${API_URL}/api/public/stats`
           ),
 
           fetch(
-            "http://localhost:5000/api/news"
+            `${API_URL}/api/news`
           ),
         ]);
 
@@ -956,7 +957,7 @@ function Home() {
 
                           <img
                             src={
-                              `http://localhost:5000${school.cover_image_url}`
+                              `${API_URL}${school.cover_image_url}`
                             }
                             alt={
                               school.name

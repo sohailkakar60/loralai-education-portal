@@ -1,4 +1,4 @@
-
+﻿
 import {
   Link,
   useParams,
@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function NewsDetails() {
@@ -48,7 +49,7 @@ function NewsDetails() {
 
           const response =
             await fetch(
-              `http://localhost:5000/api/news/${slug}`
+              `${API_URL}/api/news/${slug}`
             );
 
 
@@ -478,7 +479,7 @@ function NewsDetails() {
                       "http"
                     )
                       ? article.cover_image_url
-                      : `http://localhost:5000${article.cover_image_url}`
+                      : `${API_URL}${article.cover_image_url}`
                   }
                   alt={article.title}
                 />

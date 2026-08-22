@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function EditTutor() {
@@ -31,11 +36,18 @@ function EditTutor() {
     profile_photo_url: "",
   });
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [loading, setLoading] =
+    useState(true);
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const [success, setSuccess] =
+    useState("");
 
 
   // =========================================================
@@ -43,13 +55,19 @@ function EditTutor() {
   // =========================================================
 
   useEffect(() => {
+
     const loadTutor = async () => {
+
       try {
+
         setLoading(true);
         setError("");
 
         const token =
-          localStorage.getItem("authToken");
+          localStorage.getItem(
+            "authToken"
+          );
+
 
         if (!token) {
           throw new Error(
@@ -57,24 +75,29 @@ function EditTutor() {
           );
         }
 
+
         if (!id) {
           throw new Error(
             "Tutor ID is missing."
           );
         }
 
-        const response = await fetch(
-          `http://localhost:5000/api/tutors/${id}`,
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
+
+        const response =
+          await fetch(
+            `${API_URL}/api/tutors/${id}`,
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+              },
+            }
+          );
+
 
         const data =
           await response.json();
+
 
         if (
           !response.ok ||
@@ -86,14 +109,17 @@ function EditTutor() {
           );
         }
 
+
         const tutor =
           data.data?.tutor;
+
 
         if (!tutor) {
           throw new Error(
             "Tutor data was not returned."
           );
         }
+
 
         setForm({
           full_name:
@@ -153,22 +179,31 @@ function EditTutor() {
             "",
         });
 
+
       } catch (err) {
+
         console.error(
           "Load tutor error:",
           err
         );
 
+
         setError(
           err.message ||
             "Failed to load tutor."
         );
+
       } finally {
+
         setLoading(false);
+
       }
+
     };
 
+
     loadTutor();
+
   }, [id]);
 
 
@@ -176,16 +211,21 @@ function EditTutor() {
   // CHANGE
   // =========================================================
 
-  const handleChange = (event) => {
+  const handleChange = (
+    event
+  ) => {
+
     const {
       name,
       value,
     } = event.target;
 
+
     setForm((previous) => ({
       ...previous,
       [name]: value,
     }));
+
   };
 
 
@@ -195,45 +235,60 @@ function EditTutor() {
 
   const handleSubmit =
     async (event) => {
+
       event.preventDefault();
 
       setError("");
       setSuccess("");
 
+
       if (!form.full_name.trim()) {
+
         setError(
           "Tutor name is required."
         );
+
         return;
       }
 
+
       if (
-        Number(form.experience_years || 0) <
-        0
+        Number(
+          form.experience_years || 0
+        ) < 0
       ) {
+
         setError(
           "Experience cannot be negative."
         );
+
         return;
       }
+
 
       if (
         form.hourly_fee !== "" &&
         Number(form.hourly_fee) < 0
       ) {
+
         setError(
           "Hourly fee cannot be negative."
         );
+
         return;
       }
 
+
       try {
+
         setSaving(true);
+
 
         const token =
           localStorage.getItem(
             "authToken"
           );
+
 
         if (!token) {
           throw new Error(
@@ -241,9 +296,10 @@ function EditTutor() {
           );
         }
 
+
         const response =
           await fetch(
-            `http://localhost:5000/api/tutors/${id}`,
+            `${API_URL}/api/tutors/${id}`,
             {
               method: "PUT",
 
@@ -255,81 +311,84 @@ function EditTutor() {
                   `Bearer ${token}`,
               },
 
-              body: JSON.stringify({
-                full_name:
-                  form.full_name.trim(),
+              body:
+                JSON.stringify({
+                  full_name:
+                    form.full_name.trim(),
 
-                gender:
-                  form.gender,
+                  gender:
+                    form.gender,
 
-                qualification:
-                  form.qualification.trim() ||
-                  null,
+                  qualification:
+                    form.qualification.trim() ||
+                    null,
 
-                subjects:
-                  form.subjects.trim() ||
-                  null,
+                  subjects:
+                    form.subjects.trim() ||
+                    null,
 
-                specialization:
-                  form.specialization.trim() ||
-                  null,
+                  specialization:
+                    form.specialization.trim() ||
+                    null,
 
-                experience_years:
-                  Number(
-                    form.experience_years || 0
-                  ),
+                  experience_years:
+                    Number(
+                      form.experience_years || 0
+                    ),
 
-                phone:
-                  form.phone.trim() ||
-                  null,
+                  phone:
+                    form.phone.trim() ||
+                    null,
 
-                email:
-                  form.email.trim() ||
-                  null,
+                  email:
+                    form.email.trim() ||
+                    null,
 
-                area:
-                  form.area.trim() ||
-                  null,
+                  area:
+                    form.area.trim() ||
+                    null,
 
-                city:
-                  form.city.trim() ||
-                  "Loralai",
+                  city:
+                    form.city.trim() ||
+                    "Loralai",
 
-                district:
-                  form.district.trim() ||
-                  null,
+                  district:
+                    form.district.trim() ||
+                    null,
 
-                province:
-                  form.province.trim() ||
-                  "Balochistan",
+                  province:
+                    form.province.trim() ||
+                    "Balochistan",
 
-                country:
-                  form.country.trim() ||
-                  "Pakistan",
+                  country:
+                    form.country.trim() ||
+                    "Pakistan",
 
-                description:
-                  form.description.trim() ||
-                  null,
+                  description:
+                    form.description.trim() ||
+                    null,
 
-                hourly_fee:
-                  form.hourly_fee !== ""
-                    ? Number(
-                        form.hourly_fee
-                      )
-                    : null,
+                  hourly_fee:
+                    form.hourly_fee !== ""
+                      ? Number(
+                          form.hourly_fee
+                        )
+                      : null,
 
-                availability:
-                  form.availability,
+                  availability:
+                    form.availability,
 
-                profile_photo_url:
-                  form.profile_photo_url.trim() ||
-                  null,
-              }),
+                  profile_photo_url:
+                    form.profile_photo_url.trim() ||
+                    null,
+                }),
             }
           );
 
+
         const data =
           await response.json();
+
 
         if (
           !response.ok ||
@@ -341,30 +400,68 @@ function EditTutor() {
           );
         }
 
+
         setSuccess(
           "Tutor updated successfully."
         );
 
+
         setTimeout(() => {
+
           navigate(
             "/admin/tutors"
           );
+
         }, 900);
 
+
       } catch (err) {
+
         console.error(
           "Update tutor error:",
           err
         );
 
+
         setError(
           err.message ||
             "Failed to update tutor."
         );
+
       } finally {
+
         setSaving(false);
+
       }
+
     };
+
+
+  // =========================================================
+  // IMAGE URL HELPER
+  // =========================================================
+
+  const getImageUrl = (
+    imageUrl
+  ) => {
+
+    if (!imageUrl) {
+      return "";
+    }
+
+
+    if (
+      imageUrl.startsWith("http://") ||
+      imageUrl.startsWith("https://") ||
+      imageUrl.startsWith("data:") ||
+      imageUrl.startsWith("blob:")
+    ) {
+      return imageUrl;
+    }
+
+
+    return `${API_URL}${imageUrl}`;
+  };
 
 
   // =========================================================
@@ -383,10 +480,12 @@ function EditTutor() {
             <div className="lep-edit-tutor-state">
 
               <div className="lep-edit-tutor-state-icon">
+
                 <SmartIcon
                   name="tutor"
                   size={28}
                 />
+
               </div>
 
               <span className="lep-edit-tutor-eyebrow">
@@ -431,10 +530,12 @@ function EditTutor() {
             <div className="lep-edit-tutor-state">
 
               <div className="lep-edit-tutor-state-icon">
+
                 <SmartIcon
                   name="search"
                   size={28}
                 />
+
               </div>
 
               <span className="lep-edit-tutor-eyebrow">
@@ -453,11 +554,14 @@ function EditTutor() {
                 to="/admin/tutors"
                 className="lep-edit-tutor-back"
               >
+
                 <SmartIcon
                   name="arrow-left"
                   size={14}
                 />
+
                 Back to Tutors
+
               </Link>
 
             </div>
@@ -595,10 +699,12 @@ function EditTutor() {
                 </div>
 
                 <div className="lep-edit-tutor-section-icon">
+
                   <SmartIcon
                     name="tutor"
                     size={21}
                   />
+
                 </div>
 
                 <div>
@@ -622,11 +728,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="user"
                       size={14}
                     />
+
                     Full Name *
+
                   </label>
 
                   <input
@@ -646,11 +755,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="students"
                       size={14}
                     />
+
                     Gender
+
                   </label>
 
                   <select
@@ -662,6 +774,7 @@ function EditTutor() {
                       handleChange
                     }
                   >
+
                     <option value="not_specified">
                       Not Specified
                     </option>
@@ -677,6 +790,7 @@ function EditTutor() {
                     <option value="other">
                       Other
                     </option>
+
                   </select>
 
                 </div>
@@ -685,11 +799,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="document"
                       size={14}
                     />
+
                     Qualification
+
                   </label>
 
                   <input
@@ -708,11 +825,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="programs"
                       size={14}
                     />
+
                     Subjects
+
                   </label>
 
                   <input
@@ -731,11 +851,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="academy"
                       size={14}
                     />
+
                     Specialization
+
                   </label>
 
                   <input
@@ -754,11 +877,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="calendar"
                       size={14}
                     />
+
                     Experience (Years)
+
                   </label>
 
                   <input
@@ -793,10 +919,12 @@ function EditTutor() {
                 </div>
 
                 <div className="lep-edit-tutor-section-icon">
+
                   <SmartIcon
                     name="contacts"
                     size={21}
                   />
+
                 </div>
 
                 <div>
@@ -819,11 +947,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="phone"
                       size={14}
                     />
+
                     Phone
+
                   </label>
 
                   <input
@@ -842,11 +973,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="mail"
                       size={14}
                     />
+
                     Email
+
                   </label>
 
                   <input
@@ -866,11 +1000,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="location"
                       size={14}
                     />
+
                     Area
+
                   </label>
 
                   <input
@@ -979,10 +1116,12 @@ function EditTutor() {
                 </div>
 
                 <div className="lep-edit-tutor-section-icon">
+
                   <SmartIcon
                     name="verified"
                     size={21}
                   />
+
                 </div>
 
                 <div>
@@ -1006,11 +1145,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="fees"
                       size={14}
                     />
+
                     Hourly Fee (PKR)
+
                   </label>
 
                   <input
@@ -1031,11 +1173,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field">
 
                   <label>
+
                     <SmartIcon
                       name="calendar"
                       size={14}
                     />
+
                     Availability
+
                   </label>
 
                   <select
@@ -1068,11 +1213,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field full">
 
                   <label>
+
                     <SmartIcon
                       name="user"
                       size={14}
                     />
+
                     Profile Photo URL
+
                   </label>
 
                   <input
@@ -1097,11 +1245,9 @@ function EditTutor() {
 
                       <img
                         src={
-                          form.profile_photo_url.startsWith(
-                            "http"
+                          getImageUrl(
+                            form.profile_photo_url
                           )
-                            ? form.profile_photo_url
-                            : `http://localhost:5000${form.profile_photo_url}`
                         }
                         alt="Tutor preview"
                         onError={(event) => {
@@ -1135,11 +1281,14 @@ function EditTutor() {
                 <div className="lep-edit-tutor-field full">
 
                   <label>
+
                     <SmartIcon
                       name="document"
                       size={14}
                     />
+
                     Description
+
                   </label>
 
                   <textarea
@@ -1494,7 +1643,7 @@ const styles = `
       #effaf2;
 
     border:
-      1px solid #c8e7d0;
+      1px solid #c8d0;
 
     color:
       #16803c;
@@ -2104,6 +2253,7 @@ const styles = `
       margin-top:
         14px;
     }
+
   }
 
 
@@ -2153,6 +2303,7 @@ const styles = `
       width:
         100%;
     }
+
   }
 
 `;

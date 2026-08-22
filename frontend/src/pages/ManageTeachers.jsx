@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 // =========================================================
@@ -128,7 +129,7 @@ function ManageTeachers({ type = "school" }) {
       ] = await Promise.all([
 
         fetch(
-          `http://localhost:5000/api/admin/institutions/${id}`,
+          `${API_URL}/api/admin/institutions/${id}`,
           {
             headers: {
               Authorization:
@@ -138,7 +139,7 @@ function ManageTeachers({ type = "school" }) {
         ),
 
         fetch(
-          `http://localhost:5000/api/teachers/institution/${id}`
+          `${API_URL}/api/teachers/institution/${id}`
         ),
 
       ]);
@@ -333,7 +334,7 @@ function ManageTeachers({ type = "school" }) {
 
         const response =
           await fetch(
-            "http://localhost:5000/api/teachers",
+            `${API_URL}/api/teachers`,
             {
               method: "POST",
 
@@ -482,7 +483,7 @@ function ManageTeachers({ type = "school" }) {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/teachers/${teacherId}`,
+            `${API_URL}/api/teachers/${teacherId}`,
             {
               method: "DELETE",
 
@@ -1095,7 +1096,7 @@ function ManageTeachers({ type = "school" }) {
                                   "http"
                                 )
                                   ? photo
-                                  : `http://localhost:5000${photo}`
+                                  : `${API_URL}${photo}`
                               }
                               alt={
                                 teacher.full_name

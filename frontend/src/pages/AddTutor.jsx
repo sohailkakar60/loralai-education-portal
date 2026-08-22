@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function AddTutor() {
@@ -132,7 +133,7 @@ function AddTutor() {
 
         const response =
           await fetch(
-            "http://localhost:5000/api/tutors",
+            `${API_URL}/api/tutors`,
             {
               method: "POST",
 
@@ -2007,7 +2008,7 @@ function AddTutor() {
                             "http"
                           )
                             ? form.profile_photo_url
-                            : `http://localhost:5000${form.profile_photo_url}`
+                            : `${API_URL}${form.profile_photo_url}`
                         }
                         alt="Tutor preview"
                         onError={(

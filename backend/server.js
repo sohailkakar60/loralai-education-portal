@@ -1,6 +1,5 @@
 const dotenv = require("dotenv");
 
-// Load environment variables first
 dotenv.config();
 
 const express = require("express");
@@ -43,10 +42,29 @@ const PORT =
 // CORS
 // =========================================================
 
-// Keep this simple for local development.
-app.use(
-  cors()
-);
+// During development this allows all origins.
+// In production you can set FRONTEND_URL to your
+// deployed frontend URL.
+
+const allowedOrigin =
+  process.env.FRONTEND_URL;
+
+if (allowedOrigin) {
+
+  app.use(
+    cors({
+      origin: allowedOrigin,
+      credentials: true,
+    })
+  );
+
+} else {
+
+  app.use(
+    cors()
+  );
+
+}
 
 
 // =========================================================
@@ -249,10 +267,13 @@ app.listen(
   PORT,
   "0.0.0.0",
   async () => {
+
     console.log(
       `Loralai Education Portal API running on port ${PORT}`
     );
 
+
     await testDatabaseConnection();
+
   }
 );

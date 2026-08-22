@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 
 import {
@@ -7,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function Login() {
@@ -62,7 +62,7 @@ function Login() {
 
         const response =
           await fetch(
-            "http://localhost:5000/api/auth/login",
+            `${API_URL}/api/auth/login`,
             {
               method: "POST",
 
@@ -94,6 +94,7 @@ function Login() {
             data.message ||
               "Login failed."
           );
+
         }
 
 
@@ -112,8 +113,13 @@ function Login() {
           throw new Error(
             "Login succeeded but no account information was returned."
           );
+
         }
 
+
+        // =====================================================
+        // SAVE AUTH DATA
+        // =====================================================
 
         localStorage.setItem(
           "authToken",
@@ -127,7 +133,10 @@ function Login() {
         );
 
 
+        // =====================================================
         // ADMIN → ADMIN DASHBOARD
+        // =====================================================
+
         if (
           user.role ===
             "super_admin" ||
@@ -139,10 +148,14 @@ function Login() {
 
         } else {
 
+          // ===================================================
           // NORMAL USER → PUBLIC HOME
+          // ===================================================
+
           navigate("/");
 
         }
+
 
       } catch (err) {
 
@@ -162,6 +175,7 @@ function Login() {
         setLoading(false);
 
       }
+
     };
 
 
@@ -239,6 +253,7 @@ function Login() {
             <h1>
 
               Education
+
               <span>
                 Starts Here.
               </span>
@@ -463,9 +478,7 @@ function Login() {
                     value={
                       identifier
                     }
-                    onChange={(
-                      event
-                    ) =>
+                    onChange={(event) =>
                       setIdentifier(
                         event.target.value
                       )
@@ -514,9 +527,7 @@ function Login() {
                     value={
                       password
                     }
-                    onChange={(
-                      event
-                    ) =>
+                    onChange={(event) =>
                       setPassword(
                         event.target.value
                       )
@@ -1637,10 +1648,12 @@ const styles = `
 
 
 @keyframes lepLoginSpin {
+
   to {
     transform:
       rotate(360deg);
   }
+
 }
 
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 const CATEGORIES = [
@@ -108,7 +109,7 @@ function AdminNews() {
 
       const response =
         await fetch(
-          "http://localhost:5000/api/news/admin/all",
+          `${API_URL}/api/news/admin/all`,
           {
             headers: {
               Authorization:
@@ -333,7 +334,7 @@ function AdminNews() {
 
           response =
             await fetch(
-              `http://localhost:5000/api/news/${editingId}`,
+              `${API_URL}/api/news/${editingId}`,
               {
                 method: "PUT",
 
@@ -356,7 +357,7 @@ function AdminNews() {
 
           response =
             await fetch(
-              "http://localhost:5000/api/news",
+              `${API_URL}/api/news`,
               {
                 method: "POST",
 
@@ -461,7 +462,7 @@ function AdminNews() {
 
       const response =
         await fetch(
-          `http://localhost:5000/api/news/${article.id}`,
+          `${API_URL}/api/news/${article.id}`,
           {
             method: "DELETE",
 
@@ -549,7 +550,7 @@ function AdminNews() {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/news/${article.id}/status`,
+            `${API_URL}/api/news/${article.id}/status`,
             {
               method: "PUT",
 

@@ -7,6 +7,7 @@ import {
 import { Link } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 const TYPE_CONFIG = {
@@ -65,7 +66,6 @@ const TYPE_CONFIG = {
 
 
 function AdminInstitutions({ type }) {
-
   const config =
     TYPE_CONFIG[type];
 
@@ -102,9 +102,7 @@ function AdminInstitutions({ type }) {
 
   const loadInstitutions =
     async () => {
-
       try {
-
         setLoading(true);
         setError("");
 
@@ -113,19 +111,15 @@ function AdminInstitutions({ type }) {
             "authToken"
           );
 
-
         if (!token) {
-
           throw new Error(
             "Please login as administrator."
           );
-
         }
-
 
         const response =
           await fetch(
-            "http://localhost:5000/api/admin/institutions",
+            `${API_URL}/api/admin/institutions`,
             {
               headers: {
                 Authorization:
@@ -134,28 +128,22 @@ function AdminInstitutions({ type }) {
             }
           );
 
-
         const data =
           await response.json();
-
 
         if (
           !response.ok ||
           !data.success
         ) {
-
           throw new Error(
             data.message ||
               "Failed to load institutions."
           );
-
         }
-
 
         const allInstitutions =
           data.data?.institutions ||
           [];
-
 
         const filtered =
           allInstitutions.filter(
@@ -164,42 +152,31 @@ function AdminInstitutions({ type }) {
               type
           );
 
-
         setInstitutions(
           filtered
         );
 
-
       } catch (err) {
-
         console.error(
           "Load institutions error:",
           err
         );
-
 
         setError(
           err.message ||
             "Failed to load institutions."
         );
 
-
         setInstitutions([]);
 
-
       } finally {
-
         setLoading(false);
-
       }
-
     };
 
 
   useEffect(() => {
-
     if (!config) {
-
       setLoading(false);
 
       setError(
@@ -207,12 +184,9 @@ function AdminInstitutions({ type }) {
       );
 
       return;
-
     }
 
-
     loadInstitutions();
-
   }, [type]);
 
 
@@ -222,35 +196,34 @@ function AdminInstitutions({ type }) {
 
   const handleApprove =
     async (id) => {
-
       const confirmed =
         window.confirm(
           `Approve this ${config.singular.toLowerCase()}?`
         );
 
-
       if (!confirmed) {
         return;
       }
 
-
       try {
-
         setActionLoading(id);
-
         setError("");
         setSuccess("");
-
 
         const token =
           localStorage.getItem(
             "authToken"
           );
 
+        if (!token) {
+          throw new Error(
+            "Please login as administrator."
+          );
+        }
 
         const response =
           await fetch(
-            `http://localhost:5000/api/admin/institutions/${id}/approve`,
+            `${API_URL}/api/admin/institutions/${id}/approve`,
             {
               method: "PUT",
 
@@ -261,52 +234,39 @@ function AdminInstitutions({ type }) {
             }
           );
 
-
         const data =
           await response.json();
-
 
         if (
           !response.ok ||
           !data.success
         ) {
-
           throw new Error(
             data.message ||
               "Failed to approve institution."
           );
-
         }
-
 
         setSuccess(
           `${config.singular} approved successfully.`
         );
 
-
         await loadInstitutions();
 
-
       } catch (err) {
-
         console.error(
           "Approve institution error:",
           err
         );
-
 
         setError(
           err.message ||
             "Failed to approve institution."
         );
 
-
       } finally {
-
         setActionLoading(null);
-
       }
-
     };
 
 
@@ -316,35 +276,34 @@ function AdminInstitutions({ type }) {
 
   const handleReject =
     async (id) => {
-
       const confirmed =
         window.confirm(
           `Reject this ${config.singular.toLowerCase()}?`
         );
 
-
       if (!confirmed) {
         return;
       }
 
-
       try {
-
         setActionLoading(id);
-
         setError("");
         setSuccess("");
-
 
         const token =
           localStorage.getItem(
             "authToken"
           );
 
+        if (!token) {
+          throw new Error(
+            "Please login as administrator."
+          );
+        }
 
         const response =
           await fetch(
-            `http://localhost:5000/api/admin/institutions/${id}/reject`,
+            `${API_URL}/api/admin/institutions/${id}/reject`,
             {
               method: "PUT",
 
@@ -355,52 +314,39 @@ function AdminInstitutions({ type }) {
             }
           );
 
-
         const data =
           await response.json();
-
 
         if (
           !response.ok ||
           !data.success
         ) {
-
           throw new Error(
             data.message ||
               "Failed to reject institution."
           );
-
         }
-
 
         setSuccess(
           `${config.singular} rejected successfully.`
         );
 
-
         await loadInstitutions();
 
-
       } catch (err) {
-
         console.error(
           "Reject institution error:",
           err
         );
-
 
         setError(
           err.message ||
             "Failed to reject institution."
         );
 
-
       } finally {
-
         setActionLoading(null);
-
       }
-
     };
 
 
@@ -413,44 +359,34 @@ function AdminInstitutions({ type }) {
       id,
       name
     ) => {
-
       const confirmed =
         window.confirm(
           `Are you sure you want to permanently delete "${name}"?\n\nThis action cannot be undone.`
         );
 
-
       if (!confirmed) {
         return;
       }
 
-
       try {
-
         setActionLoading(id);
-
         setError("");
         setSuccess("");
-
 
         const token =
           localStorage.getItem(
             "authToken"
           );
 
-
         if (!token) {
-
           throw new Error(
             "Please login as administrator."
           );
-
         }
-
 
         const response =
           await fetch(
-            `http://localhost:5000/api/admin/institutions/${id}`,
+            `${API_URL}/api/admin/institutions/${id}`,
             {
               method: "DELETE",
 
@@ -461,52 +397,39 @@ function AdminInstitutions({ type }) {
             }
           );
 
-
         const data =
           await response.json();
-
 
         if (
           !response.ok ||
           !data.success
         ) {
-
           throw new Error(
             data.message ||
               "Failed to delete institution."
           );
-
         }
-
 
         setSuccess(
           `${config.singular} deleted successfully.`
         );
 
-
         await loadInstitutions();
 
-
       } catch (err) {
-
         console.error(
           "Delete institution error:",
           err
         );
-
 
         setError(
           err.message ||
             "Failed to delete institution."
         );
 
-
       } finally {
-
         setActionLoading(null);
-
       }
-
     };
 
 
@@ -516,16 +439,13 @@ function AdminInstitutions({ type }) {
 
   const filteredInstitutions =
     useMemo(() => {
-
       const query =
         search
           .trim()
           .toLowerCase();
 
-
       return institutions.filter(
         (institution) => {
-
           const matchesSearch =
             !query ||
             institution.name
@@ -541,22 +461,18 @@ function AdminInstitutions({ type }) {
               ?.toLowerCase()
               .includes(query);
 
-
           const matchesStatus =
             statusFilter ===
               "all" ||
             institution.status ===
               statusFilter;
 
-
           return (
             matchesSearch &&
             matchesStatus
           );
-
         }
       );
-
     }, [
       institutions,
       search,
@@ -570,9 +486,7 @@ function AdminInstitutions({ type }) {
 
   const statistics =
     useMemo(() => {
-
       return {
-
         total:
           institutions.length,
 
@@ -598,9 +512,7 @@ function AdminInstitutions({ type }) {
               item.status ===
               "rejected"
           ).length,
-
       };
-
     }, [institutions]);
 
 
@@ -609,7 +521,6 @@ function AdminInstitutions({ type }) {
   // =========================================================
 
   if (!config) {
-
     return (
       <main className="lep-admin-institutions">
 
@@ -626,35 +537,29 @@ function AdminInstitutions({ type }) {
 
             </div>
 
-
             <span className="lep-ai-eyebrow">
               ADMINISTRATION
             </span>
 
-
             <h2>
               Invalid Institution Type
             </h2>
-
 
             <p>
               The requested management
               section does not exist.
             </p>
 
-
             <Link
               to="/admin"
               className="lep-ai-primary-btn"
             >
-
               <SmartIcon
                 name="arrow-left"
                 size={14}
               />
 
               Admin Dashboard
-
             </Link>
 
           </div>
@@ -663,7 +568,6 @@ function AdminInstitutions({ type }) {
 
       </main>
     );
-
   }
 
 
@@ -688,6 +592,7 @@ function AdminInstitutions({ type }) {
               rgba(44,95,138,.12),
               transparent 25%
             ),
+
             linear-gradient(
               180deg,
               #f7f9fc,
@@ -2184,7 +2089,6 @@ function AdminInstitutions({ type }) {
 
         <div className="lep-ai-container">
 
-
           {/* =====================================================
               HEADER
           ===================================================== */}
@@ -2192,7 +2096,6 @@ function AdminInstitutions({ type }) {
           <header className="lep-ai-header">
 
             <div className="lep-ai-heading">
-
 
               <div className="lep-ai-page-icon">
 
@@ -2202,7 +2105,6 @@ function AdminInstitutions({ type }) {
                 />
 
               </div>
-
 
               <div>
 
@@ -2217,11 +2119,9 @@ function AdminInstitutions({ type }) {
 
                 </span>
 
-
                 <h1 className="lep-ai-title">
                   {config.title}
                 </h1>
-
 
                 <p className="lep-ai-description">
                   {config.description}
@@ -2320,7 +2220,6 @@ function AdminInstitutions({ type }) {
 
           <section className="lep-ai-metrics">
 
-
             <div className="lep-ai-metric">
 
               <div className="lep-ai-metric-icon">
@@ -2332,11 +2231,9 @@ function AdminInstitutions({ type }) {
 
               </div>
 
-
               <span>
                 TOTAL
               </span>
-
 
               <strong>
                 {statistics.total}
@@ -2356,11 +2253,9 @@ function AdminInstitutions({ type }) {
 
               </div>
 
-
               <span>
                 PUBLISHED
               </span>
-
 
               <strong>
                 {statistics.approved}
@@ -2380,11 +2275,9 @@ function AdminInstitutions({ type }) {
 
               </div>
 
-
               <span>
                 PENDING
               </span>
-
 
               <strong>
                 {statistics.pending}
@@ -2404,11 +2297,9 @@ function AdminInstitutions({ type }) {
 
               </div>
 
-
               <span>
                 REJECTED
               </span>
-
 
               <strong>
                 {statistics.rejected}
@@ -2425,14 +2316,12 @@ function AdminInstitutions({ type }) {
 
           <div className="lep-ai-filter">
 
-
             <div className="lep-ai-search">
 
               <SmartIcon
                 name="search"
                 size={17}
               />
-
 
               <input
                 type="text"
@@ -2457,7 +2346,6 @@ function AdminInstitutions({ type }) {
               <label>
                 STATUS
               </label>
-
 
               <select
                 value={
@@ -2503,7 +2391,6 @@ function AdminInstitutions({ type }) {
                 SHOWING
               </span>
 
-
               <strong>
                 {
                   filteredInstitutions.length
@@ -2532,11 +2419,9 @@ function AdminInstitutions({ type }) {
 
               </div>
 
-
               <h2>
                 Loading {config.plural}...
               </h2>
-
 
               <p>
                 Please wait while we load
@@ -2566,16 +2451,13 @@ function AdminInstitutions({ type }) {
 
                 </div>
 
-
                 <span className="lep-ai-eyebrow">
                   ADMINISTRATION
                 </span>
 
-
                 <h2>
                   No {config.plural} Yet
                 </h2>
-
 
                 <p>
                   You have not added any{" "}
@@ -2583,7 +2465,6 @@ function AdminInstitutions({ type }) {
                   yet. Add the first one to
                   start building the directory.
                 </p>
-
 
                 <Link
                   to={
@@ -2625,11 +2506,9 @@ function AdminInstitutions({ type }) {
 
                 </div>
 
-
                 <h2>
                   No Matching Institutions
                 </h2>
-
 
                 <p>
                   Try another search term or
@@ -2691,14 +2570,11 @@ function AdminInstitutions({ type }) {
                         className="lep-ai-card"
                       >
 
-
                         {/* MAIN */}
 
                         <div>
 
-
                           <div className="lep-ai-card-main">
-
 
                             <div className="lep-ai-institution-icon">
 
@@ -2713,7 +2589,6 @@ function AdminInstitutions({ type }) {
 
 
                             <div>
-
 
                               <div className="lep-ai-title-row">
 
@@ -2793,7 +2668,6 @@ function AdminInstitutions({ type }) {
 
                           <div className="lep-ai-card-meta">
 
-
                             <div className="lep-ai-meta-box">
 
                               <span>
@@ -2865,7 +2739,6 @@ function AdminInstitutions({ type }) {
                         {/* ACTIONS */}
 
                         <div className="lep-ai-actions-column">
-
 
                           {/* MANAGE */}
 

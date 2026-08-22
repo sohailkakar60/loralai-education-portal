@@ -1,10 +1,11 @@
-
+﻿
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import ReviewsSection from "../components/ReviewsSection";
 import ReviewForm from "../components/ReviewForm";
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 const TYPE_CONFIG = {
@@ -1223,7 +1224,7 @@ function InstitutionDetails({ type }) {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/public/institutions/${slug}`
+            `${API_URL}/api/public/institutions/${slug}`
           );
 
         const result =
@@ -1443,7 +1444,7 @@ function InstitutionDetails({ type }) {
                 {institution.logo_url ? (
 
                   <img
-                    src={`http://localhost:5000${institution.logo_url}`}
+                    src={`${API_URL}${institution.logo_url}`}
                     alt={
                       institution.name
                     }
@@ -1609,7 +1610,7 @@ function InstitutionDetails({ type }) {
                   />
 
                   {institution.established_year ||
-                    "—"}
+                    "â€”"}
 
                 </strong>
 
@@ -1946,7 +1947,7 @@ function InstitutionDetails({ type }) {
                               {teacher.profile_photo_url ? (
 
                                 <img
-                                  src={`http://localhost:5000${teacher.profile_photo_url}`}
+                                  src={`${API_URL}${teacher.profile_photo_url}`}
                                   alt={
                                     teacher.full_name
                                   }

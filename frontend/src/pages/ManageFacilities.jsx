@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 // =========================================================
@@ -121,7 +122,7 @@ function ManageFacilities({
       ] = await Promise.all([
 
         fetch(
-          `http://localhost:5000/api/admin/institutions/${id}`,
+          `${API_URL}/api/admin/institutions/${id}`,
           {
             headers: {
               Authorization:
@@ -131,7 +132,7 @@ function ManageFacilities({
         ),
 
         fetch(
-          `http://localhost:5000/api/facilities/institution/${id}`
+          `${API_URL}/api/facilities/institution/${id}`
         ),
 
       ]);
@@ -266,7 +267,7 @@ function ManageFacilities({
 
         const response =
           await fetch(
-            "http://localhost:5000/api/facilities",
+            `${API_URL}/api/facilities`,
             {
               method: "POST",
 
@@ -388,7 +389,7 @@ function ManageFacilities({
 
         const response =
           await fetch(
-            `http://localhost:5000/api/facilities/${facilityId}`,
+            `${API_URL}/api/facilities/${facilityId}`,
             {
               method: "DELETE",
 

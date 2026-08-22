@@ -5,6 +5,31 @@ dotenv.config();
 
 
 // =========================================================
+// REQUIRED ENVIRONMENT VARIABLES
+// =========================================================
+
+const requiredEnv = [
+  "DB_HOST",
+  "DB_USER",
+  "DB_PASSWORD",
+  "DB_NAME",
+];
+
+for (const variable of requiredEnv) {
+  if (
+    process.env[variable] === undefined ||
+    process.env[variable] === ""
+  ) {
+    console.error(
+      `Missing required environment variable: ${variable}`
+    );
+
+    process.exit(1);
+  }
+}
+
+
+// =========================================================
 // SSL CONFIG
 // =========================================================
 
@@ -67,6 +92,7 @@ const pool = mysql.createPool({
 
 const testDatabaseConnection =
   async () => {
+
     let connection;
 
     try {
@@ -78,15 +104,18 @@ const testDatabaseConnection =
       );
 
     } catch (error) {
+
       console.error(
         "MySQL connection failed:",
         error.message
       );
 
     } finally {
+
       if (connection) {
         connection.release();
       }
+
     }
   };
 

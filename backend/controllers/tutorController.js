@@ -2,10 +2,32 @@ const { pool } = require("../config/db");
 
 
 // =========================================================
+// VALID VALUES
+// =========================================================
+
+const VALID_GENDERS = [
+  "male",
+  "female",
+  "other",
+  "not_specified",
+];
+
+const VALID_AVAILABILITY = [
+  "available",
+  "busy",
+  "not_available",
+];
+
+
+// =========================================================
 // CREATE TUTOR
 // =========================================================
 
-const createTutor = async (req, res) => {
+const createTutor = async (
+  req,
+  res
+) => {
+
   const {
     full_name,
     gender,
@@ -26,121 +48,223 @@ const createTutor = async (req, res) => {
     profile_photo_url,
   } = req.body;
 
-  if (!full_name) {
+
+  if (
+    !full_name ||
+    !full_name.trim()
+  ) {
+
     return res.status(400).json({
       success: false,
-      message: "Tutor name is required.",
+      message:
+        "Tutor name is required.",
     });
+
   }
 
-  const validGenders = [
-    "male",
-    "female",
-    "other",
-    "not_specified",
-  ];
-
-  const validAvailability = [
-    "available",
-    "busy",
-    "not_available",
-  ];
 
   if (
     gender &&
-    !validGenders.includes(gender)
+    !VALID_GENDERS.includes(
+      gender
+    )
   ) {
+
     return res.status(400).json({
       success: false,
-      message: "Invalid gender.",
+      message:
+        "Invalid gender.",
     });
+
   }
+
 
   if (
     availability &&
-    !validAvailability.includes(availability)
+    !VALID_AVAILABILITY.includes(
+      availability
+    )
   ) {
+
     return res.status(400).json({
       success: false,
-      message: "Invalid availability status.",
+      message:
+        "Invalid availability status.",
     });
+
   }
 
-  try {
-    const [result] = await pool.execute(
-      `INSERT INTO tutors (
-        full_name,
-        gender,
-        qualification,
-        subjects,
-        specialization,
-        experience_years,
-        phone,
-        email,
-        area,
-        city,
-        district,
-        province,
-        country,
-        description,
-        hourly_fee,
-        availability,
-        profile_photo_url,
-        status,
-        verification_status,
-        created_by
-      )
-      VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?, ?, 'draft',
-        'unverified', ?
-      )`,
-      [
-        full_name.trim(),
-        gender || "not_specified",
-        qualification?.trim() || null,
-        subjects?.trim() || null,
-        specialization?.trim() || null,
-        Number(experience_years || 0),
-        phone?.trim() || null,
-        email?.trim() || null,
-        area?.trim() || null,
-        city?.trim() || "Loralai",
-        district?.trim() || "Loralai",
-        province?.trim() || "Balochistan",
-        country?.trim() || "Pakistan",
-        description?.trim() || null,
-        hourly_fee !== undefined &&
-        hourly_fee !== null &&
-        hourly_fee !== ""
-          ? Number(hourly_fee)
-          : null,
-        availability || "available",
-        profile_photo_url?.trim() || null,
-        req.user.userId,
-      ]
+
+  const experience =
+    Number(
+      experience_years ?? 0
     );
+
+
+  if (
+    !Number.isFinite(
+      experience
+    ) ||
+    experience < 0
+  ) {
+
+    return res.status(400).json({
+      success: false,
+      message:
+        "Experience years must be a valid non-negative number.",
+    });
+
+  }
+
+
+  let finalHourlyFee = null;
+
+
+  if (
+    hourly_fee !== undefined &&
+    hourly_fee !== null &&
+    hourly_fee !== ""
+  ) {
+
+    finalHourlyFee =
+      Number(hourly_fee);
+
+
+    if (
+      !Number.isFinite(
+        finalHourlyFee
+      ) ||
+      finalHourlyFee < 0
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message:
+          "Hourly fee must be a valid non-negative number.",
+      });
+
+    }
+
+  }
+
+
+  try {
+
+    const [result] =
+      await pool.execute(
+        `INSERT INTO tutors (
+          full_name,
+          gender,
+          qualification,
+          subjects,
+          specialization,
+          experience_years,
+          phone,
+          email,
+          area,
+          city,
+          district,
+          province,
+          country,
+          description,
+          hourly_fee,
+          availability,
+          profile_photo_url,
+          status,
+          verification_status,
+          created_by
+        )
+        VALUES (
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?, ?, 'draft',
+          'unverified', ?
+        )`,
+        [
+          full_name.trim(),
+
+          gender ||
+            "not_specified",
+
+          qualification?.trim() ||
+            null,
+
+          subjects?.trim() ||
+            null,
+
+          specialization?.trim() ||
+            null,
+
+          experience,
+
+          phone?.trim() ||
+            null,
+
+          email?.trim()
+            .toLowerCase() ||
+            null,
+
+          area?.trim() ||
+            null,
+
+          city?.trim() ||
+            "Loralai",
+
+          district?.trim() ||
+            "Loralai",
+
+          province?.trim() ||
+            "Balochistan",
+
+          country?.trim() ||
+            "Pakistan",
+
+          description?.trim() ||
+            null,
+
+          finalHourlyFee,
+
+          availability ||
+            "available",
+
+          profile_photo_url?.trim() ||
+            null,
+
+          req.user.userId,
+        ]
+      );
+
 
     return res.status(201).json({
       success: true,
-      message: "Tutor created successfully.",
+
+      message:
+        "Tutor created successfully.",
+
       data: {
         id: result.insertId,
         status: "draft",
-        verification_status: "unverified",
+        verification_status:
+          "unverified",
       },
     });
+
+
   } catch (error) {
+
     console.error(
       "Create tutor error:",
       error
     );
 
+
     return res.status(500).json({
       success: false,
-      message: "Failed to create tutor.",
+      message:
+        "Failed to create tutor.",
     });
+
   }
+
 };
 
 
@@ -148,35 +272,42 @@ const createTutor = async (req, res) => {
 // GET ALL TUTORS FOR ADMIN
 // =========================================================
 
-const getAllTutors = async (req, res) => {
+const getAllTutors = async (
+  req,
+  res
+) => {
+
   try {
-    const [tutors] = await pool.execute(
-      `SELECT
-        id,
-        full_name,
-        gender,
-        qualification,
-        subjects,
-        specialization,
-        experience_years,
-        phone,
-        email,
-        area,
-        city,
-        district,
-        province,
-        country,
-        description,
-        hourly_fee,
-        availability,
-        profile_photo_url,
-        status,
-        verification_status,
-        created_at,
-        updated_at
-      FROM tutors
-      ORDER BY created_at DESC`
-    );
+
+    const [tutors] =
+      await pool.execute(
+        `SELECT
+          id,
+          full_name,
+          gender,
+          qualification,
+          subjects,
+          specialization,
+          experience_years,
+          phone,
+          email,
+          area,
+          city,
+          district,
+          province,
+          country,
+          description,
+          hourly_fee,
+          availability,
+          profile_photo_url,
+          status,
+          verification_status,
+          created_at,
+          updated_at
+        FROM tutors
+        ORDER BY created_at DESC`
+      );
+
 
     return res.status(200).json({
       success: true,
@@ -184,17 +315,24 @@ const getAllTutors = async (req, res) => {
         tutors,
       },
     });
+
+
   } catch (error) {
+
     console.error(
       "Get all tutors error:",
       error
     );
 
+
     return res.status(500).json({
       success: false,
-      message: "Failed to load tutors.",
+      message:
+        "Failed to load tutors.",
     });
+
   }
+
 };
 
 
@@ -202,46 +340,72 @@ const getAllTutors = async (req, res) => {
 // GET ONE TUTOR FOR ADMIN
 // =========================================================
 
-const getTutorById = async (req, res) => {
-  const { id } = req.params;
+const getTutorById = async (
+  req,
+  res
+) => {
+
+  const { id } =
+    req.params;
+
+
+  if (!id) {
+
+    return res.status(400).json({
+      success: false,
+      message:
+        "Tutor ID is required.",
+    });
+
+  }
+
 
   try {
-    const [tutors] = await pool.execute(
-      `SELECT
-        id,
-        full_name,
-        gender,
-        qualification,
-        subjects,
-        specialization,
-        experience_years,
-        phone,
-        email,
-        area,
-        city,
-        district,
-        province,
-        country,
-        description,
-        hourly_fee,
-        availability,
-        profile_photo_url,
-        status,
-        verification_status,
-        created_at,
-        updated_at
-      FROM tutors
-      WHERE id = ?
-      LIMIT 1`,
-      [id]
-    );
 
-    if (tutors.length === 0) {
+    const [tutors] =
+      await pool.execute(
+        `SELECT
+          id,
+          full_name,
+          gender,
+          qualification,
+          subjects,
+          specialization,
+          experience_years,
+          phone,
+          email,
+          area,
+          city,
+          district,
+          province,
+          country,
+          description,
+          hourly_fee,
+          availability,
+          profile_photo_url,
+          status,
+          verification_status,
+          created_at,
+          updated_at
+        FROM tutors
+        WHERE id = ?
+        LIMIT 1`,
+        [id]
+      );
+
+
+    if (
+      tutors.length === 0
+    ) {
+
       return res.status(404).json({
         success: false,
-        message: "Tutor not found.",
+        message:
+          "Tutor not found.",
       });
+
     }
+
 
     return res.status(200).json({
       success: true,
@@ -249,17 +413,24 @@ const getTutorById = async (req, res) => {
         tutor: tutors[0],
       },
     });
+
+
   } catch (error) {
+
     console.error(
       "Get tutor error:",
       error
     );
 
+
     return res.status(500).json({
       success: false,
-      message: "Failed to load tutor.",
+      message:
+        "Failed to load tutor.",
     });
+
   }
+
 };
 
 
@@ -267,8 +438,14 @@ const getTutorById = async (req, res) => {
 // UPDATE TUTOR
 // =========================================================
 
-const updateTutor = async (req, res) => {
-  const { id } = req.params;
+const updateTutor = async (
+  req,
+  res
+) => {
+
+  const { id } =
+    req.params;
+
 
   const {
     full_name,
@@ -290,83 +467,232 @@ const updateTutor = async (req, res) => {
     profile_photo_url,
   } = req.body;
 
-  if (!full_name) {
+
+  if (!id) {
+
     return res.status(400).json({
       success: false,
-      message: "Tutor name is required.",
+      message:
+        "Tutor ID is required.",
     });
+
   }
 
-  try {
-    const [result] = await pool.execute(
-      `UPDATE tutors
-       SET
-         full_name = ?,
-         gender = ?,
-         qualification = ?,
-         subjects = ?,
-         specialization = ?,
-         experience_years = ?,
-         phone = ?,
-         email = ?,
-         area = ?,
-         city = ?,
-         district = ?,
-         province = ?,
-         country = ?,
-         description = ?,
-         hourly_fee = ?,
-         availability = ?,
-         profile_photo_url = ?
-       WHERE id = ?`,
-      [
-        full_name.trim(),
-        gender || "not_specified",
-        qualification?.trim() || null,
-        subjects?.trim() || null,
-        specialization?.trim() || null,
-        Number(experience_years || 0),
-        phone?.trim() || null,
-        email?.trim() || null,
-        area?.trim() || null,
-        city?.trim() || "Loralai",
-        district?.trim() || "Loralai",
-        province?.trim() || "Balochistan",
-        country?.trim() || "Pakistan",
-        description?.trim() || null,
-        hourly_fee !== undefined &&
-        hourly_fee !== null &&
-        hourly_fee !== ""
-          ? Number(hourly_fee)
-          : null,
-        availability || "available",
-        profile_photo_url?.trim() || null,
-        id,
-      ]
+
+  if (
+    !full_name ||
+    !full_name.trim()
+  ) {
+
+    return res.status(400).json({
+      success: false,
+      message:
+        "Tutor name is required.",
+    });
+
+  }
+
+
+  if (
+    gender &&
+    !VALID_GENDERS.includes(
+      gender
+    )
+  ) {
+
+    return res.status(400).json({
+      success: false,
+      message:
+        "Invalid gender.",
+    });
+
+  }
+
+
+  if (
+    availability &&
+    !VALID_AVAILABILITY.includes(
+      availability
+    )
+  ) {
+
+    return res.status(400).json({
+      success: false,
+      message:
+        "Invalid availability status.",
+    });
+
+  }
+
+
+  const experience =
+    Number(
+      experience_years ?? 0
     );
 
-    if (result.affectedRows === 0) {
+
+  if (
+    !Number.isFinite(
+      experience
+    ) ||
+    experience < 0
+  ) {
+
+    return res.status(400).json({
+      success: false,
+      message:
+        "Experience years must be a valid non-negative number.",
+    });
+
+  }
+
+
+  let finalHourlyFee = null;
+
+
+  if (
+    hourly_fee !== undefined &&
+    hourly_fee !== null &&
+    hourly_fee !== ""
+  ) {
+
+    finalHourlyFee =
+      Number(hourly_fee);
+
+
+    if (
+      !Number.isFinite(
+        finalHourlyFee
+      ) ||
+      finalHourlyFee < 0
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message:
+          "Hourly fee must be a valid non-negative number.",
+      });
+
+    }
+
+  }
+
+
+  try {
+
+    const [result] =
+      await pool.execute(
+        `UPDATE tutors
+         SET
+           full_name = ?,
+           gender = ?,
+           qualification = ?,
+           subjects = ?,
+           specialization = ?,
+           experience_years = ?,
+           phone = ?,
+           email = ?,
+           area = ?,
+           city = ?,
+           district = ?,
+           province = ?,
+           country = ?,
+           description = ?,
+           hourly_fee = ?,
+           availability = ?,
+           profile_photo_url = ?
+         WHERE id = ?`,
+        [
+          full_name.trim(),
+
+          gender ||
+            "not_specified",
+
+          qualification?.trim() ||
+            null,
+
+          subjects?.trim() ||
+            null,
+
+          specialization?.trim() ||
+            null,
+
+          experience,
+
+          phone?.trim() ||
+            null,
+
+          email?.trim()
+            .toLowerCase() ||
+            null,
+
+          area?.trim() ||
+            null,
+
+          city?.trim() ||
+            "Loralai",
+
+          district?.trim() ||
+            "Loralai",
+
+          province?.trim() ||
+            "Balochistan",
+
+          country?.trim() ||
+            "Pakistan",
+
+          description?.trim() ||
+            null,
+
+          finalHourlyFee,
+
+          availability ||
+            "available",
+
+          profile_photo_url?.trim() ||
+            null,
+
+          id,
+        ]
+      );
+
+
+    if (
+      result.affectedRows === 0
+    ) {
+
       return res.status(404).json({
         success: false,
-        message: "Tutor not found.",
+        message:
+          "Tutor not found.",
       });
+
     }
+
 
     return res.status(200).json({
       success: true,
-      message: "Tutor updated successfully.",
+      message:
+        "Tutor updated successfully.",
     });
+
+
   } catch (error) {
+
     console.error(
       "Update tutor error:",
       error
     );
 
+
     return res.status(500).json({
       success: false,
-      message: "Failed to update tutor.",
+      message:
+        "Failed to update tutor.",
     });
+
   }
+
 };
 
 
@@ -374,24 +700,50 @@ const updateTutor = async (req, res) => {
 // APPROVE TUTOR
 // =========================================================
 
-const approveTutor = async (req, res) => {
-  const { id } = req.params;
+const approveTutor = async (
+  req,
+  res
+) => {
+
+  const { id } =
+    req.params;
+
+
+  if (!id) {
+
+    return res.status(400).json({
+      success: false,
+      message:
+        "Tutor ID is required.",
+    });
+
+  }
+
 
   try {
-    const [existing] = await pool.execute(
-      `SELECT id
-       FROM tutors
-       WHERE id = ?
-       LIMIT 1`,
-      [id]
-    );
 
-    if (existing.length === 0) {
+    const [existing] =
+      await pool.execute(
+        `SELECT id
+         FROM tutors
+         WHERE id = ?
+         LIMIT 1`,
+        [id]
+      );
+
+
+    if (
+      existing.length === 0
+    ) {
+
       return res.status(404).json({
         success: false,
-        message: "Tutor not found.",
+        message:
+          "Tutor not found.",
       });
+
     }
+
 
     await pool.execute(
       `UPDATE tutors
@@ -402,21 +754,30 @@ const approveTutor = async (req, res) => {
       [id]
     );
 
+
     return res.status(200).json({
       success: true,
-      message: "Tutor approved successfully.",
+      message:
+        "Tutor approved successfully.",
     });
+
+
   } catch (error) {
+
     console.error(
       "Approve tutor error:",
       error
     );
 
+
     return res.status(500).json({
       success: false,
-      message: "Failed to approve tutor.",
+      message:
+        "Failed to approve tutor.",
     });
+
   }
+
 };
 
 
@@ -424,39 +785,75 @@ const approveTutor = async (req, res) => {
 // REJECT TUTOR
 // =========================================================
 
-const rejectTutor = async (req, res) => {
-  const { id } = req.params;
+const rejectTutor = async (
+  req,
+  res
+) => {
+
+  const { id } =
+    req.params;
+
+
+  if (!id) {
+
+    return res.status(400).json({
+      success: false,
+      message:
+        "Tutor ID is required.",
+    });
+
+  }
+
 
   try {
-    const [result] = await pool.execute(
-      `UPDATE tutors
-       SET status = 'rejected'
-       WHERE id = ?`,
-      [id]
-    );
 
-    if (result.affectedRows === 0) {
+    const [result] =
+      await pool.execute(
+        `UPDATE tutors
+         SET
+           status = 'rejected',
+           verification_status = 'unverified'
+         WHERE id = ?`,
+        [id]
+      );
+
+
+    if (
+      result.affectedRows === 0
+    ) {
+
       return res.status(404).json({
         success: false,
-        message: "Tutor not found.",
+        message:
+          "Tutor not found.",
       });
+
     }
+
 
     return res.status(200).json({
       success: true,
-      message: "Tutor rejected successfully.",
+      message:
+        "Tutor rejected successfully.",
     });
+
+
   } catch (error) {
+
     console.error(
       "Reject tutor error:",
       error
     );
 
+
     return res.status(500).json({
       success: false,
-      message: "Failed to reject tutor.",
+      message:
+        "Failed to reject tutor.",
     });
+
   }
+
 };
 
 
@@ -464,38 +861,72 @@ const rejectTutor = async (req, res) => {
 // DELETE TUTOR
 // =========================================================
 
-const deleteTutor = async (req, res) => {
-  const { id } = req.params;
+const deleteTutor = async (
+  req,
+  res
+) => {
+
+  const { id } =
+    req.params;
+
+
+  if (!id) {
+
+    return res.status(400).json({
+      success: false,
+      message:
+        "Tutor ID is required.",
+    });
+
+  }
+
 
   try {
-    const [result] = await pool.execute(
-      `DELETE FROM tutors
-       WHERE id = ?`,
-      [id]
-    );
 
-    if (result.affectedRows === 0) {
+    const [result] =
+      await pool.execute(
+        `DELETE FROM tutors
+         WHERE id = ?`,
+        [id]
+      );
+
+
+    if (
+      result.affectedRows === 0
+    ) {
+
       return res.status(404).json({
         success: false,
-        message: "Tutor not found.",
+        message:
+          "Tutor not found.",
       });
+
     }
+
 
     return res.status(200).json({
       success: true,
-      message: "Tutor deleted successfully.",
+      message:
+        "Tutor deleted successfully.",
     });
+
+
   } catch (error) {
+
     console.error(
       "Delete tutor error:",
       error
     );
 
+
     return res.status(500).json({
       success: false,
-      message: "Failed to delete tutor.",
+      message:
+        "Failed to delete tutor.",
     });
+
   }
+
 };
 
 
@@ -503,37 +934,70 @@ const deleteTutor = async (req, res) => {
 // PUBLIC TUTORS
 // =========================================================
 
-const getPublicTutors = async (req, res) => {
+const getPublicTutors = async (
+  req,
+  res
+) => {
+
   const {
     search,
     area,
     availability,
   } = req.query;
 
+
   const conditions = [
     "status = 'approved'",
     "verification_status = 'verified'",
   ];
 
+
   const values = [];
 
+
   if (availability) {
+
+    if (
+      !VALID_AVAILABILITY.includes(
+        availability
+      )
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid availability status.",
+      });
+
+    }
+
+
     conditions.push(
       "availability = ?"
     );
 
-    values.push(availability);
+    values.push(
+      availability
+    );
+
   }
 
+
   if (area) {
+
     conditions.push(
       "area LIKE ?"
     );
 
-    values.push(`%${area}%`);
+    values.push(
+      `%${area}%`
+    );
+
   }
 
+
   if (search) {
+
     conditions.push(`
       (
         full_name LIKE ?
@@ -544,7 +1008,10 @@ const getPublicTutors = async (req, res) => {
       )
     `);
 
-    const searchValue = `%${search}%`;
+
+    const searchValue =
+      `%${search}%`;
+
 
     values.push(
       searchValue,
@@ -553,30 +1020,37 @@ const getPublicTutors = async (req, res) => {
       searchValue,
       searchValue
     );
+
   }
 
+
   try {
-    const [tutors] = await pool.execute(
-      `SELECT
-        id,
-        full_name,
-        gender,
-        qualification,
-        subjects,
-        specialization,
-        experience_years,
-        area,
-        city,
-        district,
-        description,
-        hourly_fee,
-        availability,
-        profile_photo_url
-      FROM tutors
-      WHERE ${conditions.join(" AND ")}
-      ORDER BY full_name ASC`,
-      values
-    );
+
+    const [tutors] =
+      await pool.execute(
+        `SELECT
+          id,
+          full_name,
+          gender,
+          qualification,
+          subjects,
+          specialization,
+          experience_years,
+          area,
+          city,
+          district,
+          description,
+          hourly_fee,
+          availability,
+          profile_photo_url
+        FROM tutors
+        WHERE ${conditions.join(
+          " AND "
+        )}
+        ORDER BY full_name ASC`,
+        values
+      );
+
 
     return res.status(200).json({
       success: true,
@@ -584,17 +1058,24 @@ const getPublicTutors = async (req, res) => {
         tutors,
       },
     });
+
+
   } catch (error) {
+
     console.error(
       "Public tutors error:",
       error
     );
 
+
     return res.status(500).json({
       success: false,
-      message: "Failed to load tutors.",
+      message:
+        "Failed to load tutors.",
     });
+
   }
+
 };
 
 
@@ -602,66 +1083,100 @@ const getPublicTutors = async (req, res) => {
 // PUBLIC TUTOR DETAILS
 // =========================================================
 
-const getPublicTutorById = async (
-  req,
-  res
-) => {
-  const { id } = req.params;
+const getPublicTutorById =
+  async (
+    req,
+    res
+  ) => {
 
-  try {
-    const [tutors] = await pool.execute(
-      `SELECT
-        id,
-        full_name,
-        gender,
-        qualification,
-        subjects,
-        specialization,
-        experience_years,
-        area,
-        city,
-        district,
-        province,
-        country,
-        description,
-        hourly_fee,
-        availability,
-        profile_photo_url
-      FROM tutors
-      WHERE id = ?
-        AND status = 'approved'
-        AND verification_status = 'verified'
-      LIMIT 1`,
-      [id]
-    );
+    const { id } =
+      req.params;
 
-    if (tutors.length === 0) {
-      return res.status(404).json({
+
+    if (!id) {
+
+      return res.status(400).json({
         success: false,
-        message: "Tutor not found.",
+        message:
+          "Tutor ID is required.",
       });
+
     }
 
-    return res.status(200).json({
-      success: true,
-      data: {
-        tutor: tutors[0],
-      },
-    });
-  } catch (error) {
-    console.error(
-      "Public tutor details error:",
-      error
-    );
 
-    return res.status(500).json({
-      success: false,
-      message:
-        "Failed to load tutor.",
-    });
-  }
-};
+    try {
 
+      const [tutors] =
+        await pool.execute(
+          `SELECT
+            id,
+            full_name,
+            gender,
+            qualification,
+            subjects,
+            specialization,
+            experience_years,
+            area,
+            city,
+            district,
+            province,
+            country,
+            description,
+            hourly_fee,
+            availability,
+            profile_photo_url
+          FROM tutors
+          WHERE id = ?
+            AND status = 'approved'
+            AND verification_status = 'verified'
+          LIMIT 1`,
+          [id]
+        );
+
+
+      if (
+        tutors.length === 0
+      ) {
+
+        return res.status(404).json({
+          success: false,
+          message:
+            "Tutor not found.",
+        });
+
+      }
+
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          tutor: tutors[0],
+        },
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "Public tutor details error:",
+        error
+      );
+
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Failed to load tutor.",
+      });
+
+    }
+
+  };
+
+
+// =========================================================
+// EXPORTS
+// =========================================================
 
 module.exports = {
   createTutor,

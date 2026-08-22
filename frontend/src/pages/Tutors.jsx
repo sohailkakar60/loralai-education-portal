@@ -1,4 +1,4 @@
-
+﻿
 import { useEffect, useState } from "react";
 import {
   Link,
@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function Tutors() {
@@ -99,7 +100,7 @@ function Tutors() {
 
       const response =
         await fetch(
-          `http://localhost:5000/api/tutors/public${
+          `${API_URL}/api/tutors/public${
             query
               ? `?${query}`
               : ""
@@ -152,7 +153,7 @@ function Tutors() {
 
 
   // =========================================================
-  // URL → STATE
+  // URL â†’ STATE
   // =========================================================
 
   useEffect(() => {
@@ -905,7 +906,7 @@ function Tutors() {
                             {tutor.profile_photo_url ? (
 
                               <img
-                                src={`http://localhost:5000${tutor.profile_photo_url}`}
+                                src={`${API_URL}${tutor.profile_photo_url}`}
                                 alt={
                                   tutor.full_name
                                 }

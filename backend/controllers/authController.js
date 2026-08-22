@@ -5,10 +5,41 @@ const { pool } = require("../config/db");
 
 
 // =========================================================
+// JWT HELPER
+// =========================================================
+
+const createToken = (user) => {
+
+  if (!process.env.JWT_SECRET) {
+    throw new Error(
+      "JWT_SECRET is not configured."
+    );
+  }
+
+  return jwt.sign(
+    {
+      userId: user.id,
+      role: user.role,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn:
+        process.env.JWT_EXPIRES_IN ||
+        "7d",
+    }
+  );
+};
+
+
+// =========================================================
 // REGISTER NORMAL USER
 // =========================================================
 
-const registerUser = async (req, res) => {
+const registerUser = async (
+  req,
+  res
+) => {
+
   const {
     full_name,
     email,
@@ -16,40 +47,67 @@ const registerUser = async (req, res) => {
     password,
   } = req.body;
 
-  if (!full_name || !full_name.trim()) {
+
+  if (
+    !full_name ||
+    !full_name.trim()
+  ) {
+
     return res.status(400).json({
       success: false,
-      message: "Full name is required.",
+      message:
+        "Full name is required.",
     });
+
   }
 
+
   if (!email && !phone) {
+
     return res.status(400).json({
       success: false,
       message:
         "Email or phone number is required.",
     });
+
   }
 
-  if (!password || password.length < 6) {
+
+  if (
+    !password ||
+    password.length < 6
+  ) {
+
     return res.status(400).json({
       success: false,
       message:
         "Password must be at least 6 characters.",
     });
+
   }
 
+
   try {
+
     const cleanEmail =
-      email?.trim().toLowerCase() || null;
+      email?.trim().toLowerCase() ||
+      null;
 
     const cleanPhone =
-      phone?.trim() || null;
+      phone?.trim() ||
+      null;
 
-    // Check duplicate email / phone
+
+    // =======================================================
+    // CHECK DUPLICATE EMAIL / PHONE
+    // =======================================================
+
     const [existingUsers] =
       await pool.execute(
-        `SELECT id, email, phone
+        `SELECT
+          id,
+          email,
+          phone
          FROM users
          WHERE
            (? IS NOT NULL AND email = ?)
@@ -64,38 +122,68 @@ const registerUser = async (req, res) => {
         ]
       );
 
-    if (existingUsers.length > 0) {
+
+    if (
+      existingUsers.length > 0
+    ) {
+
+      const existingUser =
+        existingUsers[0];
+
+
       if (
         cleanEmail &&
-        existingUsers[0].email === cleanEmail
+        existingUser.email ===
+          cleanEmail
       ) {
+
         return res.status(409).json({
           success: false,
           message:
             "An account with this email already exists.",
         });
+
       }
+
 
       if (
         cleanPhone &&
-        existingUsers[0].phone === cleanPhone
+        existingUser.phone ===
+          cleanPhone
       ) {
+
         return res.status(409).json({
           success: false,
           message:
             "An account with this phone number already exists.",
         });
+
       }
+
 
       return res.status(409).json({
         success: false,
         message:
           "An account with these details already exists.",
       });
+
     }
 
+
+    // =======================================================
+    // HASH PASSWORD
+    // =======================================================
+
     const passwordHash =
-      await bcrypt.hash(password, 12);
+      await bcrypt.hash(
+        password,
+        12
+      );
+
+
+    // =======================================================
+    // CREATE USER
+    // =======================================================
 
     const [result] =
       await pool.execute(
@@ -107,7 +195,14 @@ const registerUser = async (req, res) => {
           role,
           status
         )
-        VALUES (?, ?, ?, ?, 'user', 'active')`,
+        VALUES (
+          ?,
+          ?,
+          ?,
+          ?,
+          'user',
+          'active'
+        )`,
         [
           full_name.trim(),
           cleanEmail,
@@ -116,52 +211,57 @@ const registerUser = async (req, res) => {
         ]
       );
 
+
     const userId =
       result.insertId;
 
-    const token = jwt.sign(
-      {
-        userId,
-        role: "user",
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn:
-          process.env.JWT_EXPIRES_IN ||
-          "7d",
-      }
-    );
+
+    const user = {
+      id: userId,
+      full_name:
+        full_name.trim(),
+      email: cleanEmail,
+      phone: cleanPhone,
+      role: "user",
+    };
+
+
+    // =======================================================
+    // JWT
+    // =======================================================
+
+    const token =
+      createToken(user);
+
 
     return res.status(201).json({
       success: true,
       message:
         "Account created successfully.",
+
       data: {
-        user: {
-          id: userId,
-          full_name:
-            full_name.trim(),
-          email: cleanEmail,
-          phone: cleanPhone,
-          role: "user",
-        },
+        user,
         token,
       },
     });
+
+
   } catch (error) {
+
     console.error(
       "Registration error:",
       error
     );
 
+
     return res.status(500).json({
       success: false,
       message:
-        error.sqlMessage ||
-        error.message ||
         "Registration failed.",
     });
+
   }
+
 };
 
 
@@ -169,23 +269,36 @@ const registerUser = async (req, res) => {
 // LOGIN
 // =========================================================
 
-const loginUser = async (req, res) => {
+const loginUser = async (
+  req,
+  res
+) => {
+
   const {
     identifier,
     password,
   } = req.body;
 
-  if (!identifier || !password) {
+
+  if (
+    !identifier ||
+    !password
+  ) {
+
     return res.status(400).json({
       success: false,
       message:
         "Phone/email and password are required.",
     });
+
   }
 
+
   try {
+
     const cleanIdentifier =
       identifier.trim();
+
 
     const [users] =
       await pool.execute(
@@ -198,8 +311,9 @@ const loginUser = async (req, res) => {
           role,
           status
          FROM users
-         WHERE phone = ?
-            OR email = ?
+         WHERE
+           phone = ?
+           OR email = ?
          LIMIT 1`,
         [
           cleanIdentifier,
@@ -207,23 +321,45 @@ const loginUser = async (req, res) => {
         ]
       );
 
-    if (users.length === 0) {
+
+    if (
+      users.length === 0
+    ) {
+
       return res.status(401).json({
         success: false,
         message:
           "Invalid phone/email or password.",
       });
+
     }
 
-    const user = users[0];
 
-    if (user.status !== "active") {
+    const user =
+      users[0];
+
+
+    // =======================================================
+    // ACCOUNT STATUS
+    // =======================================================
+
+    if (
+      user.status !==
+      "active"
+    ) {
+
       return res.status(403).json({
         success: false,
         message:
           "Your account is not active.",
       });
+
     }
+
+
+    // =======================================================
+    // PASSWORD
+    // =======================================================
 
     const passwordMatch =
       await bcrypt.compare(
@@ -231,55 +367,76 @@ const loginUser = async (req, res) => {
         user.password_hash
       );
 
+
     if (!passwordMatch) {
+
       return res.status(401).json({
         success: false,
         message:
           "Invalid phone/email or password.",
       });
+
     }
 
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn:
-          process.env.JWT_EXPIRES_IN ||
-          "7d",
-      }
-    );
+
+    // =======================================================
+    // USER RESPONSE
+    // =======================================================
+
+    const safeUser = {
+      id: user.id,
+      full_name:
+        user.full_name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+    };
+
+
+    // =======================================================
+    // JWT
+    // =======================================================
+
+    const token =
+      createToken(
+        safeUser
+      );
+
 
     return res.status(200).json({
       success: true,
-      message: "Login successful.",
+      message:
+        "Login successful.",
+
       data: {
-        user: {
-          id: user.id,
-          full_name:
-            user.full_name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-        },
+        user: safeUser,
         token,
       },
     });
+
+
   } catch (error) {
+
     console.error(
       "Login error:",
       error
     );
 
+
     return res.status(500).json({
       success: false,
-      message: "Login failed.",
+      message:
+        "Login failed.",
     });
+
   }
+
 };
 
+
+// =========================================================
+// EXPORTS
+// =========================================================
 
 module.exports = {
   registerUser,

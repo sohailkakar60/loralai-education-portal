@@ -1,4 +1,4 @@
-
+﻿
 import { useEffect, useState } from "react";
 import {
   Link,
@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function TutorDetails() {
@@ -41,7 +42,7 @@ function TutorDetails() {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/tutors/public/${id}`
+            `${API_URL}/api/tutors/public/${id}`
           );
 
 
@@ -326,7 +327,7 @@ function TutorDetails() {
                         "http"
                       )
                         ? photo
-                        : `http://localhost:5000${photo}`
+                        : `${API_URL}${photo}`
                     }
                     alt={
                       tutor.full_name

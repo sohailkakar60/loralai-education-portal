@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 const INSTITUTION_TYPES = [
@@ -139,7 +140,7 @@ function AdminDashboard() {
 
         const dashboardResponse =
           await fetch(
-            "http://localhost:5000/api/admin/dashboard",
+            `${API_URL}/api/admin/dashboard`,
             {
               headers: {
                 Authorization:
@@ -170,7 +171,7 @@ function AdminDashboard() {
         try {
           const newsResponse =
             await fetch(
-              "http://localhost:5000/api/news/admin/all",
+              `${API_URL}/api/news/admin/all`,
               {
                 headers: {
                   Authorization:
@@ -305,7 +306,7 @@ function AdminDashboard() {
 
                 const response =
                   await fetch(
-                    `http://localhost:5000/api/admin/institutions?type=${config.type}`,
+                    `${API_URL}/api/admin/institutions?type=${config.type}`,
                     {
                       headers: {
                         Authorization:

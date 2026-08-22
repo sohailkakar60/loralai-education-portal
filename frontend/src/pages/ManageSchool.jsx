@@ -1,21 +1,41 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import API_URL from "../config/api";
+
+
 function ManageSchool() {
   const { id } = useParams();
 
-  const [school, setSchool] = useState(null);
-  const [programs, setPrograms] = useState([]);
+  const [school, setSchool] =
+    useState(null);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [programs, setPrograms] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+
+  // =========================================================
+  // LOAD SCHOOL
+  // =========================================================
 
   const loadSchool = async () => {
     try {
+
       setLoading(true);
       setError("");
 
-      const token = localStorage.getItem("authToken");
+
+      const token =
+        localStorage.getItem(
+          "authToken"
+        );
+
 
       if (!token) {
         throw new Error(
@@ -23,70 +43,120 @@ function ManageSchool() {
         );
       }
 
-      const response = await fetch(
-        `http://localhost:5000/api/admin/institutions/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
 
-      const data = await response.json();
+      const response =
+        await fetch(
+          `${API_URL}/api/admin/institutions/${id}`,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
+        );
 
-      if (!response.ok || !data.success) {
+
+      const data =
+        await response.json();
+
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
         throw new Error(
           data.message ||
             "Failed to load school."
         );
       }
 
+
       setSchool(
         data.data?.institution
       );
+
     } catch (err) {
+
       console.error(err);
+
 
       setError(
         err.message ||
           "Failed to load school."
       );
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
-  const loadPrograms = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/programs/institution/${id}`
-      );
 
-      const data = await response.json();
+  // =========================================================
+  // LOAD PROGRAMS
+  // =========================================================
 
-      if (!response.ok || !data.success) {
-        return;
+  const loadPrograms =
+    async () => {
+
+      try {
+
+        const response =
+          await fetch(
+            `${API_URL}/api/programs/institution/${id}`
+          );
+
+
+        const data =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+          return;
+        }
+
+
+        setPrograms(
+          data.data?.programs || []
+        );
+
+      } catch (err) {
+
+        console.error(
+          "Program loading error:",
+          err
+        );
+
       }
 
-      setPrograms(
-        data.data?.programs || []
-      );
-    } catch (err) {
-      console.error(
-        "Program loading error:",
-        err
-      );
-    }
-  };
+    };
+
+
+  // =========================================================
+  // LOAD
+  // =========================================================
 
   useEffect(() => {
+
     loadSchool();
     loadPrograms();
+
   }, [id]);
 
+
+  // =========================================================
+  // LOADING
+  // =========================================================
+
   if (loading) {
+
     return (
       <main className="manage-school-page">
+
         <div className="container">
 
           <div className="manage-school-loading">
@@ -102,13 +172,22 @@ function ManageSchool() {
           </div>
 
         </div>
+
       </main>
     );
+
   }
 
+
+  // =========================================================
+  // NOT FOUND
+  // =========================================================
+
   if (!school) {
+
     return (
       <main className="manage-school-page">
+
         <div className="container">
 
           <div className="manage-school-error">
@@ -136,16 +215,22 @@ function ManageSchool() {
           </div>
 
         </div>
+
       </main>
     );
+
   }
+
 
   return (
     <main className="manage-school-page">
 
       <div className="container">
 
-        {/* HEADER */}
+
+        {/* =====================================================
+            HEADER
+        ===================================================== */}
 
         <div className="manage-school-header">
 
@@ -166,6 +251,7 @@ function ManageSchool() {
 
           </div>
 
+
           <div className="manage-school-header-actions">
 
             <Link
@@ -175,23 +261,30 @@ function ManageSchool() {
               ← Schools
             </Link>
 
+
             <Link
               to={`/admin/schools/${id}/edit`}
               className="secondary-btn"
             >
-              
               Edit School
             </Link>
-<Link
-  to={`/admin/schools/${id}/programs`}
-  className="manage-module-card manage-module-card-active"
-></Link>
+
+
+            <Link
+              to={`/admin/schools/${id}/programs`}
+              className="manage-module-card manage-module-card-active"
+            >
+              Academic Programs
+            </Link>
+
           </div>
 
         </div>
 
 
-        {/* SCHOOL SUMMARY */}
+        {/* =====================================================
+            SCHOOL SUMMARY
+        ===================================================== */}
 
         <section className="manage-school-summary">
 
@@ -249,7 +342,9 @@ function ManageSchool() {
         </section>
 
 
-        {/* MAIN MANAGEMENT */}
+        {/* =====================================================
+            MAIN MANAGEMENT
+        ===================================================== */}
 
         <section className="manage-school-section">
 
@@ -277,7 +372,10 @@ function ManageSchool() {
 
           <div className="manage-module-grid">
 
-            {/* PROGRAMS */}
+
+            {/* =================================================
+                PROGRAMS
+            ================================================= */}
 
             <Link
               to={`/admin/schools/${id}/manage`}
@@ -308,7 +406,9 @@ function ManageSchool() {
             </Link>
 
 
-            {/* TEACHERS */}
+            {/* =================================================
+                TEACHERS
+            ================================================= */}
 
             <Link
               to={`/admin/schools/${id}/teachers`}
@@ -335,7 +435,9 @@ function ManageSchool() {
             </Link>
 
 
-            {/* FACILITIES */}
+            {/* =================================================
+                FACILITIES
+            ================================================= */}
 
             <Link
               to={`/admin/schools/${id}/facilities`}
@@ -362,7 +464,9 @@ function ManageSchool() {
             </Link>
 
 
-            {/* CONTACTS */}
+            {/* =================================================
+                CONTACTS
+            ================================================= */}
 
             <Link
               to={`/admin/schools/${id}/contacts`}
@@ -389,7 +493,9 @@ function ManageSchool() {
             </Link>
 
 
-            {/* FEES */}
+            {/* =================================================
+                FEES
+            ================================================= */}
 
             <Link
               to={`/admin/schools/${id}/fees`}
@@ -416,7 +522,9 @@ function ManageSchool() {
             </Link>
 
 
-            {/* ADMISSIONS */}
+            {/* =================================================
+                ADMISSIONS
+            ================================================= */}
 
             <Link
               to={`/admin/schools/${id}/admissions`}
@@ -443,7 +551,9 @@ function ManageSchool() {
             </Link>
 
 
-            {/* EDIT SCHOOL */}
+            {/* =================================================
+                EDIT SCHOOL
+            ================================================= */}
 
             <Link
               to={`/admin/schools/${id}/edit`}
@@ -474,7 +584,9 @@ function ManageSchool() {
         </section>
 
 
-        {/* BASIC SCHOOL INFORMATION */}
+        {/* =====================================================
+            BASIC SCHOOL INFORMATION
+        ===================================================== */}
 
         <section className="manage-school-section">
 
@@ -498,6 +610,7 @@ function ManageSchool() {
           <div className="manage-basic-grid">
 
             <div>
+
               <span>
                 Institution Type
               </span>
@@ -505,10 +618,12 @@ function ManageSchool() {
               <strong>
                 {school.institution_type}
               </strong>
+
             </div>
 
 
             <div>
+
               <span>
                 Ownership
               </span>
@@ -516,10 +631,12 @@ function ManageSchool() {
               <strong>
                 {school.ownership_type}
               </strong>
+
             </div>
 
 
             <div>
+
               <span>
                 Gender Type
               </span>
@@ -527,10 +644,12 @@ function ManageSchool() {
               <strong>
                 {school.gender_type}
               </strong>
+
             </div>
 
 
             <div>
+
               <span>
                 Principal
               </span>
@@ -539,10 +658,12 @@ function ManageSchool() {
                 {school.principal_name ||
                   "Not provided"}
               </strong>
+
             </div>
 
 
             <div>
+
               <span>
                 Established Year
               </span>
@@ -551,10 +672,12 @@ function ManageSchool() {
                 {school.established_year ||
                   "Not provided"}
               </strong>
+
             </div>
 
 
             <div>
+
               <span>
                 Phone
               </span>
@@ -563,10 +686,12 @@ function ManageSchool() {
                 {school.phone ||
                   "Not provided"}
               </strong>
+
             </div>
 
 
             <div>
+
               <span>
                 Email
               </span>
@@ -575,10 +700,12 @@ function ManageSchool() {
                 {school.email ||
                   "Not provided"}
               </strong>
+
             </div>
 
 
             <div>
+
               <span>
                 Area
               </span>
@@ -587,10 +714,12 @@ function ManageSchool() {
                 {school.area ||
                   "Not provided"}
               </strong>
+
             </div>
 
 
             <div>
+
               <span>
                 City
               </span>
@@ -598,10 +727,12 @@ function ManageSchool() {
               <strong>
                 {school.city}
               </strong>
+
             </div>
 
 
             <div>
+
               <span>
                 District
               </span>
@@ -609,6 +740,7 @@ function ManageSchool() {
               <strong>
                 {school.district}
               </strong>
+
             </div>
 
           </div>
@@ -616,7 +748,9 @@ function ManageSchool() {
         </section>
 
 
-        {/* ADDRESS */}
+        {/* =====================================================
+            ADDRESS
+        ===================================================== */}
 
         <section className="manage-school-section">
 
@@ -650,13 +784,16 @@ function ManageSchool() {
               {school.country}
             </span>
 
-            {(school.latitude !== null &&
-              school.longitude !== null) && (
+
+            {school.latitude !== null &&
+              school.longitude !== null && (
+
               <span>
                 Coordinates:{" "}
                 {school.latitude},{" "}
                 {school.longitude}
               </span>
+
             )}
 
           </div>
@@ -668,5 +805,6 @@ function ManageSchool() {
     </main>
   );
 }
+
 
 export default ManageSchool;

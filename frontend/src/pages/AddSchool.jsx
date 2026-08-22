@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import API_URL from "../config/api";
+
 function AddSchool() {
   const navigate = useNavigate();
 
@@ -32,12 +34,20 @@ function AddSchool() {
     teacher_count: 0,
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [loading, setLoading] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const [success, setSuccess] =
+    useState("");
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const {
+      name,
+      value,
+    } = event.target;
 
     setForm((previous) => ({
       ...previous,
@@ -52,12 +62,16 @@ function AddSchool() {
     setSuccess("");
 
     if (!form.name.trim()) {
-      setError("School name is required.");
+      setError(
+        "School name is required."
+      );
       return;
     }
 
     if (!form.address.trim()) {
-      setError("School address is required.");
+      setError(
+        "School address is required."
+      );
       return;
     }
 
@@ -65,7 +79,9 @@ function AddSchool() {
       setLoading(true);
 
       const token =
-        localStorage.getItem("authToken");
+        localStorage.getItem(
+          "authToken"
+        );
 
       if (!token) {
         throw new Error(
@@ -73,86 +89,117 @@ function AddSchool() {
         );
       }
 
-      const response = await fetch(
-        "http://localhost:5000/api/admin/institutions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            name: form.name.trim(),
+      const response =
+        await fetch(
+          `${API_URL}/api/admin/institutions`,
+          {
+            method: "POST",
 
-            institution_type:
-              form.institution_type,
+            headers: {
+              "Content-Type":
+                "application/json",
 
-            ownership_type:
-              form.ownership_type,
+              Authorization:
+                `Bearer ${token}`,
+            },
 
-            gender_type:
-              form.gender_type,
+            body: JSON.stringify({
+              name:
+                form.name.trim(),
 
-            principal_name:
-              form.principal_name.trim() || null,
+              institution_type:
+                form.institution_type,
 
-            established_year:
-              form.established_year
-                ? Number(form.established_year)
-                : null,
+              ownership_type:
+                form.ownership_type,
 
-            description:
-              form.description.trim() || null,
+              gender_type:
+                form.gender_type,
 
-            phone:
-              form.phone.trim() || null,
+              principal_name:
+                form.principal_name.trim() ||
+                null,
 
-            email:
-              form.email.trim() || null,
+              established_year:
+                form.established_year
+                  ? Number(
+                      form.established_year
+                    )
+                  : null,
 
-            website:
-              form.website.trim() || null,
+              description:
+                form.description.trim() ||
+                null,
 
-            address:
-              form.address.trim(),
+              phone:
+                form.phone.trim() ||
+                null,
 
-            area:
-              form.area.trim() || null,
+              email:
+                form.email.trim() ||
+                null,
 
-            city:
-              form.city.trim() || "Loralai",
+              website:
+                form.website.trim() ||
+                null,
 
-            district:
-              form.district.trim() || "Loralai",
+              address:
+                form.address.trim(),
 
-            province:
-              form.province.trim() || "Balochistan",
+              area:
+                form.area.trim() ||
+                null,
 
-            country:
-              form.country.trim() || "Pakistan",
+              city:
+                form.city.trim() ||
+                "Loralai",
 
-            latitude:
-              form.latitude
-                ? Number(form.latitude)
-                : null,
+              district:
+                form.district.trim() ||
+                "Loralai",
 
-            longitude:
-              form.longitude
-                ? Number(form.longitude)
-                : null,
+              province:
+                form.province.trim() ||
+                "Balochistan",
 
-            student_count:
-              Number(form.student_count || 0),
+              country:
+                form.country.trim() ||
+                "Pakistan",
 
-            teacher_count:
-              Number(form.teacher_count || 0),
-          }),
-        }
-      );
+              latitude:
+                form.latitude
+                  ? Number(
+                      form.latitude
+                    )
+                  : null,
 
-      const data = await response.json();
+              longitude:
+                form.longitude
+                  ? Number(
+                      form.longitude
+                    )
+                  : null,
 
-      if (!response.ok || !data.success) {
+              student_count:
+                Number(
+                  form.student_count || 0
+                ),
+
+              teacher_count:
+                Number(
+                  form.teacher_count || 0
+                ),
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
         throw new Error(
           data.message ||
             "Failed to create school."
@@ -166,6 +213,7 @@ function AddSchool() {
       setTimeout(() => {
         navigate("/admin");
       }, 1200);
+
     } catch (err) {
       console.error(
         "Create school error:",
@@ -176,6 +224,7 @@ function AddSchool() {
         err.message ||
           "Failed to create school."
       );
+
     } finally {
       setLoading(false);
     }
@@ -188,6 +237,7 @@ function AddSchool() {
         <div className="add-school-header">
 
           <div>
+
             <span className="official-label">
               ADMINISTRATION
             </span>
@@ -200,6 +250,7 @@ function AddSchool() {
               Enter the verified information you
               collected during your school visit.
             </p>
+
           </div>
 
           <Link
@@ -211,7 +262,6 @@ function AddSchool() {
 
         </div>
 
-
         <form
           className="add-school-form"
           onSubmit={handleSubmit}
@@ -222,9 +272,13 @@ function AddSchool() {
           <section className="form-section">
 
             <div className="form-section-heading">
-              <span>01</span>
+
+              <span>
+                01
+              </span>
 
               <div>
+
                 <h2>
                   Basic Information
                 </h2>
@@ -232,12 +286,15 @@ function AddSchool() {
                 <p>
                   Main information about the institution.
                 </p>
+
               </div>
+
             </div>
 
             <div className="form-grid">
 
               <div className="form-field full-width">
+
                 <label htmlFor="name">
                   School Name *
                 </label>
@@ -245,15 +302,20 @@ function AddSchool() {
                 <input
                   id="name"
                   name="name"
-                  value={form.name}
-                  onChange={handleChange}
+                  value={
+                    form.name
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="Loralai Public School"
                   required
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="institution_type">
                   Institution Type
                 </label>
@@ -261,9 +323,14 @@ function AddSchool() {
                 <select
                   id="institution_type"
                   name="institution_type"
-                  value={form.institution_type}
-                  onChange={handleChange}
+                  value={
+                    form.institution_type
+                  }
+                  onChange={
+                    handleChange
+                  }
                 >
+
                   <option value="school">
                     School
                   </option>
@@ -279,11 +346,13 @@ function AddSchool() {
                   <option value="academy">
                     Academy
                   </option>
+
                 </select>
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="ownership_type">
                   Ownership
                 </label>
@@ -291,9 +360,14 @@ function AddSchool() {
                 <select
                   id="ownership_type"
                   name="ownership_type"
-                  value={form.ownership_type}
-                  onChange={handleChange}
+                  value={
+                    form.ownership_type
+                  }
+                  onChange={
+                    handleChange
+                  }
                 >
+
                   <option value="private">
                     Private
                   </option>
@@ -309,11 +383,13 @@ function AddSchool() {
                   <option value="other">
                     Other
                   </option>
+
                 </select>
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="gender_type">
                   Gender Type
                 </label>
@@ -321,9 +397,14 @@ function AddSchool() {
                 <select
                   id="gender_type"
                   name="gender_type"
-                  value={form.gender_type}
-                  onChange={handleChange}
+                  value={
+                    form.gender_type
+                  }
+                  onChange={
+                    handleChange
+                  }
                 >
+
                   <option value="not_specified">
                     Not Specified
                   </option>
@@ -339,11 +420,13 @@ function AddSchool() {
                   <option value="co_education">
                     Co-Education
                   </option>
+
                 </select>
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="principal_name">
                   Principal Name
                 </label>
@@ -351,14 +434,19 @@ function AddSchool() {
                 <input
                   id="principal_name"
                   name="principal_name"
-                  value={form.principal_name}
-                  onChange={handleChange}
+                  value={
+                    form.principal_name
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="Principal name"
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="established_year">
                   Established Year
                 </label>
@@ -369,14 +457,19 @@ function AddSchool() {
                   type="number"
                   min="1800"
                   max="2100"
-                  value={form.established_year}
-                  onChange={handleChange}
+                  value={
+                    form.established_year
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="2010"
                 />
+
               </div>
 
-
               <div className="form-field full-width">
+
                 <label htmlFor="description">
                   Description
                 </label>
@@ -385,24 +478,33 @@ function AddSchool() {
                   id="description"
                   name="description"
                   rows="5"
-                  value={form.description}
-                  onChange={handleChange}
+                  value={
+                    form.description
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="Write a verified description..."
                 />
+
               </div>
 
             </div>
-          </section>
 
+          </section>
 
           {/* CONTACT */}
 
           <section className="form-section">
 
             <div className="form-section-heading">
-              <span>02</span>
+
+              <span>
+                02
+              </span>
 
               <div>
+
                 <h2>
                   Contact Information
                 </h2>
@@ -410,12 +512,15 @@ function AddSchool() {
                 <p>
                   Official contact information.
                 </p>
+
               </div>
+
             </div>
 
             <div className="form-grid">
 
               <div className="form-field">
+
                 <label htmlFor="phone">
                   Phone
                 </label>
@@ -423,14 +528,19 @@ function AddSchool() {
                 <input
                   id="phone"
                   name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
+                  value={
+                    form.phone
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="03001234567"
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="email">
                   Email
                 </label>
@@ -439,14 +549,19 @@ function AddSchool() {
                   id="email"
                   name="email"
                   type="email"
-                  value={form.email}
-                  onChange={handleChange}
+                  value={
+                    form.email
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="school@example.com"
                 />
+
               </div>
 
-
               <div className="form-field full-width">
+
                 <label htmlFor="website">
                   Website
                 </label>
@@ -454,24 +569,33 @@ function AddSchool() {
                 <input
                   id="website"
                   name="website"
-                  value={form.website}
-                  onChange={handleChange}
+                  value={
+                    form.website
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="https://example.com"
                 />
+
               </div>
 
             </div>
-          </section>
 
+          </section>
 
           {/* LOCATION */}
 
           <section className="form-section">
 
             <div className="form-section-heading">
-              <span>03</span>
+
+              <span>
+                03
+              </span>
 
               <div>
+
                 <h2>
                   Location
                 </h2>
@@ -480,12 +604,15 @@ function AddSchool() {
                   Enter the exact location collected
                   during your visit.
                 </p>
+
               </div>
+
             </div>
 
             <div className="form-grid">
 
               <div className="form-field full-width">
+
                 <label htmlFor="address">
                   Full Address *
                 </label>
@@ -494,15 +621,20 @@ function AddSchool() {
                   id="address"
                   name="address"
                   rows="4"
-                  value={form.address}
-                  onChange={handleChange}
+                  value={
+                    form.address
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="Complete school address"
                   required
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="area">
                   Area
                 </label>
@@ -510,14 +642,19 @@ function AddSchool() {
                 <input
                   id="area"
                   name="area"
-                  value={form.area}
-                  onChange={handleChange}
+                  value={
+                    form.area
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="Main City"
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="city">
                   City
                 </label>
@@ -525,13 +662,18 @@ function AddSchool() {
                 <input
                   id="city"
                   name="city"
-                  value={form.city}
-                  onChange={handleChange}
+                  value={
+                    form.city
+                  }
+                  onChange={
+                    handleChange
+                  }
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="district">
                   District
                 </label>
@@ -539,13 +681,18 @@ function AddSchool() {
                 <input
                   id="district"
                   name="district"
-                  value={form.district}
-                  onChange={handleChange}
+                  value={
+                    form.district
+                  }
+                  onChange={
+                    handleChange
+                  }
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="province">
                   Province
                 </label>
@@ -553,13 +700,18 @@ function AddSchool() {
                 <input
                   id="province"
                   name="province"
-                  value={form.province}
-                  onChange={handleChange}
+                  value={
+                    form.province
+                  }
+                  onChange={
+                    handleChange
+                  }
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="country">
                   Country
                 </label>
@@ -567,13 +719,18 @@ function AddSchool() {
                 <input
                   id="country"
                   name="country"
-                  value={form.country}
-                  onChange={handleChange}
+                  value={
+                    form.country
+                  }
+                  onChange={
+                    handleChange
+                  }
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="latitude">
                   Latitude
                 </label>
@@ -583,14 +740,19 @@ function AddSchool() {
                   name="latitude"
                   type="number"
                   step="any"
-                  value={form.latitude}
-                  onChange={handleChange}
+                  value={
+                    form.latitude
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="30.3700"
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="longitude">
                   Longitude
                 </label>
@@ -600,24 +762,33 @@ function AddSchool() {
                   name="longitude"
                   type="number"
                   step="any"
-                  value={form.longitude}
-                  onChange={handleChange}
+                  value={
+                    form.longitude
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="68.5970"
                 />
+
               </div>
 
             </div>
-          </section>
 
+          </section>
 
           {/* STATISTICS */}
 
           <section className="form-section">
 
             <div className="form-section-heading">
-              <span>04</span>
+
+              <span>
+                04
+              </span>
 
               <div>
+
                 <h2>
                   School Statistics
                 </h2>
@@ -625,12 +796,15 @@ function AddSchool() {
                 <p>
                   Verified statistics collected from the school.
                 </p>
+
               </div>
+
             </div>
 
             <div className="form-grid">
 
               <div className="form-field">
+
                 <label htmlFor="student_count">
                   Total Students
                 </label>
@@ -640,13 +814,18 @@ function AddSchool() {
                   name="student_count"
                   type="number"
                   min="0"
-                  value={form.student_count}
-                  onChange={handleChange}
+                  value={
+                    form.student_count
+                  }
+                  onChange={
+                    handleChange
+                  }
                 />
+
               </div>
 
-
               <div className="form-field">
+
                 <label htmlFor="teacher_count">
                   Total Teachers
                 </label>
@@ -656,14 +835,19 @@ function AddSchool() {
                   name="teacher_count"
                   type="number"
                   min="0"
-                  value={form.teacher_count}
-                  onChange={handleChange}
+                  value={
+                    form.teacher_count
+                  }
+                  onChange={
+                    handleChange
+                  }
                 />
+
               </div>
 
             </div>
-          </section>
 
+          </section>
 
           {/* MESSAGES */}
 
@@ -678,7 +862,6 @@ function AddSchool() {
               {success}
             </div>
           )}
-
 
           {/* ACTIONS */}
 
@@ -704,6 +887,7 @@ function AddSchool() {
           </div>
 
         </form>
+
       </div>
     </main>
   );

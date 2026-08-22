@@ -2,19 +2,30 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function AdminTutors() {
-  const [tutors, setTutors] = useState([]);
+  const [tutors, setTutors] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(null);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [actionLoading, setActionLoading] =
+    useState(null);
 
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [error, setError] =
+    useState("");
+
+  const [success, setSuccess] =
+    useState("");
+
+  const [search, setSearch] =
+    useState("");
+
+  const [statusFilter, setStatusFilter] =
+    useState("all");
 
 
   // =========================================================
@@ -37,7 +48,7 @@ function AdminTutors() {
 
       const response =
         await fetch(
-          "http://localhost:5000/api/tutors",
+          `${API_URL}/api/tutors`,
           {
             headers: {
               Authorization:
@@ -128,6 +139,13 @@ function AdminTutors() {
         );
 
 
+      if (!token) {
+        throw new Error(
+          "Please login as administrator."
+        );
+      }
+
+
       const options = {
         method:
           action === "delete"
@@ -143,7 +161,7 @@ function AdminTutors() {
 
       const response =
         await fetch(
-          `http://localhost:5000/api/tutors/${tutorId}${
+          `${API_URL}/api/tutors/${tutorId}${
             action === "delete"
               ? ""
               : `/${action}`
@@ -311,11 +329,13 @@ function AdminTutors() {
               rgba(44,95,138,.12),
               transparent 25%
             ),
+
             radial-gradient(
               circle at 5% 70%,
               rgba(255,107,0,.06),
               transparent 22%
             ),
+
             linear-gradient(
               180deg,
               #f7f9fc,
@@ -1742,8 +1762,12 @@ function AdminTutors() {
               <button
                 type="button"
                 className="lep-tutor-refresh"
-                onClick={loadTutors}
-                disabled={loading}
+                onClick={
+                  loadTutors
+                }
+                disabled={
+                  loading
+                }
               >
 
                 <SmartIcon
@@ -2157,7 +2181,9 @@ function AdminTutors() {
 
                     return (
                       <article
-                        key={tutor.id}
+                        key={
+                          tutor.id
+                        }
                         className="lep-tutor-card"
                       >
 
@@ -2165,7 +2191,6 @@ function AdminTutors() {
                         {/* MAIN */}
 
                         <div>
-
 
                           <div className="lep-tutor-main">
 
@@ -2175,10 +2200,18 @@ function AdminTutors() {
                               {tutor.profile_photo_url ? (
 
                                 <img
-                                  src={`http://localhost:5000${tutor.profile_photo_url}`}
+                                  src={
+                                    tutor.profile_photo_url.startsWith("http")
+                                      ? tutor.profile_photo_url
+                                      : `${API_URL}${tutor.profile_photo_url}`
+                                  }
                                   alt={
                                     tutor.full_name
                                   }
+                                  onError={(event) => {
+                                    event.currentTarget.style.display =
+                                      "none";
+                                  }}
                                 />
 
                               ) : (
@@ -2461,6 +2494,7 @@ function AdminTutors() {
 
                       </article>
                     );
+
                   }
                 )}
 

@@ -1,4 +1,4 @@
-import {
+﻿import {
   useEffect,
   useMemo,
   useState,
@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function ManageAdmissions() {
@@ -95,7 +96,7 @@ function ManageAdmissions() {
       ] = await Promise.all([
 
         fetch(
-          `http://localhost:5000/api/admin/institutions/${id}`,
+          `${API_URL}/api/admin/institutions/${id}`,
           {
             headers: {
               Authorization:
@@ -105,7 +106,7 @@ function ManageAdmissions() {
         ),
 
         fetch(
-          `http://localhost:5000/api/admissions/institution/${id}`
+          `${API_URL}/api/admissions/institution/${id}`
         ),
 
       ]);
@@ -281,7 +282,7 @@ function ManageAdmissions() {
 
         const response =
           await fetch(
-            "http://localhost:5000/api/admissions",
+            `${API_URL}/api/admissions`,
             {
               method: "POST",
 
@@ -420,7 +421,7 @@ function ManageAdmissions() {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/admissions/${admissionId}`,
+            `${API_URL}/api/admissions/${admissionId}`,
             {
               method: "DELETE",
 
@@ -1237,7 +1238,7 @@ function ManageAdmissions() {
                                   admission.application_start_date
                                 )
                               }
-                              {" — "}
+                              {" â€” "}
                               {
                                 formatDate(
                                   admission.application_end_date

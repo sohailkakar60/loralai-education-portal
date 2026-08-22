@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
-
+import API_URL from "../config/api";
 
 const TYPE_CONFIG = {
   school: {
@@ -42,18 +42,12 @@ const TYPE_CONFIG = {
   },
 };
 
-
 function AddInstitution({ type }) {
   const navigate = useNavigate();
 
   const config =
     TYPE_CONFIG[type] ||
     TYPE_CONFIG.school;
-
-
-  // =========================================================
-  // FORM
-  // =========================================================
 
   const [form, setForm] = useState({
     name: "",
@@ -84,7 +78,6 @@ function AddInstitution({ type }) {
     teacher_count: 0,
   });
 
-
   const [saving, setSaving] =
     useState(false);
 
@@ -93,7 +86,6 @@ function AddInstitution({ type }) {
 
   const [success, setSuccess] =
     useState("");
-
 
   // =========================================================
   // CHANGE
@@ -111,7 +103,6 @@ function AddInstitution({ type }) {
     }));
   };
 
-
   // =========================================================
   // SUBMIT
   // =========================================================
@@ -124,7 +115,6 @@ function AddInstitution({ type }) {
     setError("");
     setSuccess("");
 
-
     if (!form.name.trim()) {
       setError(
         `${config.singular} name is required.`
@@ -133,7 +123,6 @@ function AddInstitution({ type }) {
       return;
     }
 
-
     if (!form.address.trim()) {
       setError(
         "Address is required."
@@ -141,7 +130,6 @@ function AddInstitution({ type }) {
 
       return;
     }
-
 
     // Validate latitude
     if (
@@ -161,7 +149,6 @@ function AddInstitution({ type }) {
       return;
     }
 
-
     // Validate longitude
     if (
       form.longitude !== "" &&
@@ -180,16 +167,13 @@ function AddInstitution({ type }) {
       return;
     }
 
-
     try {
       setSaving(true);
-
 
       const token =
         localStorage.getItem(
           "authToken"
         );
-
 
       if (!token) {
         throw new Error(
@@ -197,10 +181,9 @@ function AddInstitution({ type }) {
         );
       }
 
-
       const response =
         await fetch(
-          "http://localhost:5000/api/admin/institutions",
+          `${API_URL}/api/admin/institutions`,
           {
             method: "POST",
 
@@ -277,12 +260,16 @@ function AddInstitution({ type }) {
 
               latitude:
                 form.latitude !== ""
-                  ? Number(form.latitude)
+                  ? Number(
+                      form.latitude
+                    )
                   : null,
 
               longitude:
                 form.longitude !== ""
-                  ? Number(form.longitude)
+                  ? Number(
+                      form.longitude
+                    )
                   : null,
 
               logo_url:
@@ -306,10 +293,8 @@ function AddInstitution({ type }) {
           }
         );
 
-
       const data =
         await response.json();
-
 
       if (
         !response.ok ||
@@ -321,11 +306,9 @@ function AddInstitution({ type }) {
         );
       }
 
-
       setSuccess(
         `${config.singular} created successfully.`
       );
-
 
       setTimeout(() => {
         navigate(
@@ -333,9 +316,7 @@ function AddInstitution({ type }) {
         );
       }, 900);
 
-
     } catch (err) {
-
       console.error(
         "Create institution error:",
         err
@@ -347,17 +328,13 @@ function AddInstitution({ type }) {
       );
 
     } finally {
-
       setSaving(false);
-
     }
   };
-
 
   return (
     <>
       <style>{`
-
         /* =====================================================
            ADD INSTITUTION
            PROFESSIONAL 3D FORM
@@ -375,11 +352,13 @@ function AddInstitution({ type }) {
               rgba(44,95,138,.12),
               transparent 25%
             ),
+
             radial-gradient(
               circle at 5% 70%,
               rgba(255,107,0,.06),
               transparent 22%
             ),
+
             linear-gradient(
               180deg,
               #f7f9fc,
@@ -388,7 +367,6 @@ function AddInstitution({ type }) {
 
           color: #2d3748;
         }
-
 
         .lep-add-container {
           width:
@@ -400,7 +378,6 @@ function AddInstitution({ type }) {
           margin:
             0 auto;
         }
-
 
         /* =====================================================
            HEADER
@@ -423,7 +400,6 @@ function AddInstitution({ type }) {
             25px;
         }
 
-
         .lep-add-heading {
           display:
             flex;
@@ -434,7 +410,6 @@ function AddInstitution({ type }) {
           gap:
             15px;
         }
-
 
         .lep-add-page-icon {
           width:
@@ -479,7 +454,6 @@ function AddInstitution({ type }) {
             transform .3s ease;
         }
 
-
         .lep-add-page-icon:hover {
           transform:
             perspective(700px)
@@ -487,7 +461,6 @@ function AddInstitution({ type }) {
             rotateY(0)
             translateY(-4px);
         }
-
 
         .lep-add-eyebrow {
           display:
@@ -512,7 +485,6 @@ function AddInstitution({ type }) {
             1.5px;
         }
 
-
         .lep-add-title {
           margin-top:
             6px;
@@ -534,7 +506,6 @@ function AddInstitution({ type }) {
             -1.7px;
         }
 
-
         .lep-add-description {
           max-width:
             700px;
@@ -551,7 +522,6 @@ function AddInstitution({ type }) {
           line-height:
             1.7;
         }
-
 
         .lep-add-back {
           min-height:
@@ -603,7 +573,6 @@ function AddInstitution({ type }) {
             color .2s ease;
         }
 
-
         .lep-add-back:hover {
           transform:
             translateY(-2px);
@@ -614,7 +583,6 @@ function AddInstitution({ type }) {
           color:
             #2c5f8a;
         }
-
 
         /* =====================================================
            MESSAGES
@@ -646,7 +614,6 @@ function AddInstitution({ type }) {
             800;
         }
 
-
         .lep-add-message.error {
           background:
             #fff2f2;
@@ -657,7 +624,6 @@ function AddInstitution({ type }) {
           color:
             #b42318;
         }
-
 
         .lep-add-message.success {
           background:
@@ -670,7 +636,6 @@ function AddInstitution({ type }) {
             #16803c;
         }
 
-
         /* =====================================================
            FORM
         ===================================================== */
@@ -682,7 +647,6 @@ function AddInstitution({ type }) {
           gap:
             16px;
         }
-
 
         /* =====================================================
            FORM SECTION
@@ -716,7 +680,6 @@ function AddInstitution({ type }) {
             box-shadow .25s ease;
         }
 
-
         .lep-form-section:hover {
           border-color:
             rgba(44,95,138,.18);
@@ -725,7 +688,6 @@ function AddInstitution({ type }) {
             0 18px 38px
             rgba(26,54,93,.075);
         }
-
 
         .lep-form-section::after {
           content:
@@ -756,7 +718,6 @@ function AddInstitution({ type }) {
             none;
         }
 
-
         .lep-form-section-header {
           display:
             flex;
@@ -770,7 +731,6 @@ function AddInstitution({ type }) {
           margin-bottom:
             21px;
         }
-
 
         .lep-form-number {
           width:
@@ -803,7 +763,6 @@ function AddInstitution({ type }) {
           font-weight:
             900;
         }
-
 
         .lep-form-section-icon {
           width:
@@ -848,7 +807,6 @@ function AddInstitution({ type }) {
             transform .3s ease;
         }
 
-
         .lep-form-section:hover
         .lep-form-section-icon {
           transform:
@@ -857,7 +815,6 @@ function AddInstitution({ type }) {
             rotateY(0)
             translateY(-3px);
         }
-
 
         .lep-form-section-heading h2 {
           color:
@@ -869,7 +826,6 @@ function AddInstitution({ type }) {
           line-height:
             1.2;
         }
-
 
         .lep-form-section-heading p {
           margin-top:
@@ -884,7 +840,6 @@ function AddInstitution({ type }) {
           line-height:
             1.5;
         }
-
 
         /* =====================================================
            GRID
@@ -901,12 +856,10 @@ function AddInstitution({ type }) {
             13px;
         }
 
-
         .lep-field.full {
           grid-column:
             1 / -1;
         }
-
 
         /* =====================================================
            FIELD
@@ -922,7 +875,6 @@ function AddInstitution({ type }) {
           gap:
             7px;
         }
-
 
         .lep-field label {
           display:
@@ -944,12 +896,10 @@ function AddInstitution({ type }) {
             900;
         }
 
-
         .lep-field label svg {
           color:
             #2c5f8a;
         }
-
 
         .lep-field input,
         .lep-field textarea,
@@ -987,7 +937,6 @@ function AddInstitution({ type }) {
             background .2s ease;
         }
 
-
         .lep-field input:focus,
         .lep-field textarea:focus,
         .lep-field select:focus {
@@ -1002,7 +951,6 @@ function AddInstitution({ type }) {
             rgba(44,95,138,.07);
         }
 
-
         .lep-field textarea {
           min-height:
             100px;
@@ -1014,7 +962,6 @@ function AddInstitution({ type }) {
             1.65;
         }
 
-
         .lep-field small {
           color:
             #94a3b8;
@@ -1025,7 +972,6 @@ function AddInstitution({ type }) {
           line-height:
             1.5;
         }
-
 
         /* =====================================================
            COORDINATES
@@ -1066,7 +1012,6 @@ function AddInstitution({ type }) {
             1.55;
         }
 
-
         .lep-coordinate-note svg {
           color:
             #ff6b00;
@@ -1074,7 +1019,6 @@ function AddInstitution({ type }) {
           flex-shrink:
             0;
         }
-
 
         /* =====================================================
            MEDIA PREVIEW
@@ -1093,7 +1037,6 @@ function AddInstitution({ type }) {
           margin-top:
             14px;
         }
-
 
         .lep-media-preview {
           min-height:
@@ -1121,7 +1064,6 @@ function AddInstitution({ type }) {
             #f8fafc;
         }
 
-
         .lep-media-preview img {
           width:
             100%;
@@ -1135,7 +1077,6 @@ function AddInstitution({ type }) {
           display:
             block;
         }
-
 
         .lep-media-placeholder {
           display:
@@ -1160,12 +1101,10 @@ function AddInstitution({ type }) {
             9px;
         }
 
-
         .lep-media-placeholder svg {
           color:
             #2c5f8a;
         }
-
 
         /* =====================================================
            SUBMIT ACTIONS
@@ -1198,7 +1137,6 @@ function AddInstitution({ type }) {
             rgba(26,54,93,.15);
         }
 
-
         .lep-form-actions-note {
           display:
             flex;
@@ -1219,12 +1157,10 @@ function AddInstitution({ type }) {
             1.5;
         }
 
-
         .lep-form-actions-note svg {
           color:
             #ff9348;
         }
-
 
         .lep-form-buttons {
           display:
@@ -1236,7 +1172,6 @@ function AddInstitution({ type }) {
           gap:
             8px;
         }
-
 
         .lep-cancel-btn,
         .lep-save-btn {
@@ -1281,7 +1216,6 @@ function AddInstitution({ type }) {
             background .2s ease;
         }
 
-
         .lep-cancel-btn {
           border:
             1px solid
@@ -1293,7 +1227,6 @@ function AddInstitution({ type }) {
           color:
             #ffffff;
         }
-
 
         .lep-save-btn {
           border:
@@ -1310,113 +1243,93 @@ function AddInstitution({ type }) {
             rgba(0,0,0,.13);
         }
 
-
         .lep-cancel-btn:hover,
         .lep-save-btn:hover {
           transform:
             translateY(-2px);
         }
 
-
         .lep-save-btn:hover {
           background:
             #e65f00;
         }
-
 
         /* =====================================================
            RESPONSIVE
         ===================================================== */
 
         @media (max-width: 800px) {
-
           .lep-add-header {
             display:
               block;
           }
-
 
           .lep-add-back {
             margin-top:
               16px;
           }
 
-
           .lep-form-grid {
             grid-template-columns:
               1fr;
           }
-
 
           .lep-field.full {
             grid-column:
               auto;
           }
 
-
           .lep-media-preview-grid {
             grid-template-columns:
               1fr;
           }
-
 
           .lep-form-actions {
             display:
               block;
           }
 
-
           .lep-form-buttons {
             margin-top:
               14px;
           }
-
         }
 
-
         @media (max-width: 550px) {
-
           .lep-add-page {
             padding-top:
               30px;
           }
-
 
           .lep-add-heading {
             align-items:
               flex-start;
           }
 
-
           .lep-add-title {
             font-size:
               36px;
           }
-
 
           .lep-form-section {
             padding:
               19px;
           }
 
-
           .lep-form-section-header {
             align-items:
               flex-start;
           }
-
 
           .lep-form-number {
             display:
               none;
           }
 
-
           .lep-form-actions {
             padding:
               17px;
           }
-
 
           .lep-form-buttons {
             display:
@@ -1426,22 +1339,17 @@ function AddInstitution({ type }) {
               1fr 1fr;
           }
 
-
           .lep-cancel-btn,
           .lep-save-btn {
             width:
               100%;
           }
-
         }
-
       `}</style>
-
 
       <main className="lep-add-page">
 
         <div className="lep-add-container">
-
 
           {/* =====================================================
               HEADER
@@ -1451,7 +1359,6 @@ function AddInstitution({ type }) {
 
             <div className="lep-add-heading">
 
-
               <div className="lep-add-page-icon">
 
                 <SmartIcon
@@ -1460,7 +1367,6 @@ function AddInstitution({ type }) {
                 />
 
               </div>
-
 
               <div>
 
@@ -1475,11 +1381,9 @@ function AddInstitution({ type }) {
 
                 </span>
 
-
                 <h1 className="lep-add-title">
                   {config.title}
                 </h1>
-
 
                 <p className="lep-add-description">
                   {config.description}
@@ -1489,11 +1393,8 @@ function AddInstitution({ type }) {
 
             </div>
 
-
             <Link
-              to={
-                config.backPath
-              }
+              to={config.backPath}
               className="lep-add-back"
             >
 
@@ -1507,7 +1408,6 @@ function AddInstitution({ type }) {
             </Link>
 
           </header>
-
 
           {/* =====================================================
               MESSAGES
@@ -1528,7 +1428,6 @@ function AddInstitution({ type }) {
 
           )}
 
-
           {success && (
 
             <div className="lep-add-message success">
@@ -1544,18 +1443,14 @@ function AddInstitution({ type }) {
 
           )}
 
-
           {/* =====================================================
               FORM
           ===================================================== */}
 
           <form
             className="lep-add-form"
-            onSubmit={
-              handleSubmit
-            }
+            onSubmit={handleSubmit}
           >
-
 
             {/* =================================================
                 01 BASIC INFORMATION
@@ -1569,25 +1464,20 @@ function AddInstitution({ type }) {
                   01
                 </div>
 
-
                 <div className="lep-form-section-icon">
 
                   <SmartIcon
-                    name={
-                      config.icon
-                    }
+                    name={config.icon}
                     size={21}
                   />
 
                 </div>
-
 
                 <div className="lep-form-section-heading">
 
                   <h2>
                     Basic Information
                   </h2>
-
 
                   <p>
                     Main information about the{" "}
@@ -1598,9 +1488,7 @@ function AddInstitution({ type }) {
 
               </div>
 
-
               <div className="lep-form-grid">
-
 
                 {/* NAME */}
 
@@ -1617,7 +1505,6 @@ function AddInstitution({ type }) {
 
                   </label>
 
-
                   <input
                     name="name"
                     value={
@@ -1631,7 +1518,6 @@ function AddInstitution({ type }) {
                   />
 
                 </div>
-
 
                 {/* OWNERSHIP */}
 
@@ -1647,7 +1533,6 @@ function AddInstitution({ type }) {
                     Ownership
 
                   </label>
-
 
                   <select
                     name="ownership_type"
@@ -1679,7 +1564,6 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
                 {/* GENDER */}
 
                 <div className="lep-field">
@@ -1694,7 +1578,6 @@ function AddInstitution({ type }) {
                     Gender Type
 
                   </label>
-
 
                   <select
                     name="gender_type"
@@ -1726,7 +1609,6 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
                 {/* PRINCIPAL */}
 
                 <div className="lep-field">
@@ -1742,7 +1624,6 @@ function AddInstitution({ type }) {
 
                   </label>
 
-
                   <input
                     name="principal_name"
                     value={
@@ -1755,7 +1636,6 @@ function AddInstitution({ type }) {
                   />
 
                 </div>
-
 
                 {/* ESTABLISHED */}
 
@@ -1771,7 +1651,6 @@ function AddInstitution({ type }) {
                     Established Year
 
                   </label>
-
 
                   <input
                     name="established_year"
@@ -1789,7 +1668,6 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
                 {/* DESCRIPTION */}
 
                 <div className="lep-field full">
@@ -1804,7 +1682,6 @@ function AddInstitution({ type }) {
                     Description
 
                   </label>
-
 
                   <textarea
                     name="description"
@@ -1824,7 +1701,6 @@ function AddInstitution({ type }) {
 
             </section>
 
-
             {/* =================================================
                 02 CONTACT
             ================================================= */}
@@ -1837,7 +1713,6 @@ function AddInstitution({ type }) {
                   02
                 </div>
 
-
                 <div className="lep-form-section-icon">
 
                   <SmartIcon
@@ -1847,13 +1722,11 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
                 <div className="lep-form-section-heading">
 
                   <h2>
                     Contact Information
                   </h2>
-
 
                   <p>
                     Official contact details.
@@ -1863,9 +1736,7 @@ function AddInstitution({ type }) {
 
               </div>
 
-
               <div className="lep-form-grid">
-
 
                 <div className="lep-field">
 
@@ -1880,7 +1751,6 @@ function AddInstitution({ type }) {
 
                   </label>
 
-
                   <input
                     name="phone"
                     value={
@@ -1894,7 +1764,6 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
                 <div className="lep-field">
 
                   <label>
@@ -1907,7 +1776,6 @@ function AddInstitution({ type }) {
                     Email
 
                   </label>
-
 
                   <input
                     type="email"
@@ -1923,7 +1791,6 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
                 <div className="lep-field full">
 
                   <label>
@@ -1936,7 +1803,6 @@ function AddInstitution({ type }) {
                     Website
 
                   </label>
-
 
                   <input
                     name="website"
@@ -1955,7 +1821,6 @@ function AddInstitution({ type }) {
 
             </section>
 
-
             {/* =================================================
                 03 LOCATION
             ================================================= */}
@@ -1968,7 +1833,6 @@ function AddInstitution({ type }) {
                   03
                 </div>
 
-
                 <div className="lep-form-section-icon">
 
                   <SmartIcon
@@ -1978,13 +1842,11 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
                 <div className="lep-form-section-heading">
 
                   <h2>
                     Location
                   </h2>
-
 
                   <p>
                     Complete physical location
@@ -1995,11 +1857,7 @@ function AddInstitution({ type }) {
 
               </div>
 
-
               <div className="lep-form-grid">
-
-
-                {/* ADDRESS */}
 
                 <div className="lep-field full">
 
@@ -2013,7 +1871,6 @@ function AddInstitution({ type }) {
                     Full Address *
 
                   </label>
-
 
                   <textarea
                     name="address"
@@ -2030,15 +1887,11 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
-                {/* AREA */}
-
                 <div className="lep-field">
 
                   <label>
                     Area
                   </label>
-
 
                   <input
                     name="area"
@@ -2053,15 +1906,11 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
-                {/* CITY */}
-
                 <div className="lep-field">
 
                   <label>
                     City
                   </label>
-
 
                   <input
                     name="city"
@@ -2075,15 +1924,11 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
-                {/* DISTRICT */}
-
                 <div className="lep-field">
 
                   <label>
                     District
                   </label>
-
 
                   <input
                     name="district"
@@ -2097,15 +1942,11 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
-                {/* PROVINCE */}
-
                 <div className="lep-field">
 
                   <label>
                     Province
                   </label>
-
 
                   <input
                     name="province"
@@ -2119,15 +1960,11 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
-                {/* COUNTRY */}
-
                 <div className="lep-field">
 
                   <label>
                     Country
                   </label>
-
 
                   <input
                     name="country"
@@ -2141,9 +1978,6 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
-                {/* LATITUDE */}
-
                 <div className="lep-field">
 
                   <label>
@@ -2156,7 +1990,6 @@ function AddInstitution({ type }) {
                     Latitude
 
                   </label>
-
 
                   <input
                     name="latitude"
@@ -2173,15 +2006,11 @@ function AddInstitution({ type }) {
                     placeholder="e.g. 30.3700"
                   />
 
-
                   <small>
                     Valid range: -90 to 90
                   </small>
 
                 </div>
-
-
-                {/* LONGITUDE */}
 
                 <div className="lep-field">
 
@@ -2195,7 +2024,6 @@ function AddInstitution({ type }) {
                     Longitude
 
                   </label>
-
 
                   <input
                     name="longitude"
@@ -2212,13 +2040,11 @@ function AddInstitution({ type }) {
                     placeholder="e.g. 68.3500"
                   />
 
-
                   <small>
                     Valid range: -180 to 180
                   </small>
 
                 </div>
-
 
                 <div className="lep-field full">
 
@@ -2244,7 +2070,6 @@ function AddInstitution({ type }) {
 
             </section>
 
-
             {/* =================================================
                 04 MEDIA
             ================================================= */}
@@ -2257,7 +2082,6 @@ function AddInstitution({ type }) {
                   04
                 </div>
 
-
                 <div className="lep-form-section-icon">
 
                   <SmartIcon
@@ -2267,13 +2091,11 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
                 <div className="lep-form-section-heading">
 
                   <h2>
                     Media
                   </h2>
-
 
                   <p>
                     Optional logo and cover image URLs.
@@ -2283,11 +2105,7 @@ function AddInstitution({ type }) {
 
               </div>
 
-
               <div className="lep-form-grid">
-
-
-                {/* LOGO */}
 
                 <div className="lep-field">
 
@@ -2302,7 +2120,6 @@ function AddInstitution({ type }) {
 
                   </label>
 
-
                   <input
                     name="logo_url"
                     value={
@@ -2316,9 +2133,6 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
-                {/* COVER */}
-
                 <div className="lep-field">
 
                   <label>
@@ -2331,7 +2145,6 @@ function AddInstitution({ type }) {
                     Cover Image URL
 
                   </label>
-
 
                   <input
                     name="cover_image_url"
@@ -2348,9 +2161,7 @@ function AddInstitution({ type }) {
 
               </div>
 
-
               <div className="lep-media-preview-grid">
-
 
                 <div className="lep-media-preview">
 
@@ -2385,7 +2196,6 @@ function AddInstitution({ type }) {
                   )}
 
                 </div>
-
 
                 <div className="lep-media-preview">
 
@@ -2425,7 +2235,6 @@ function AddInstitution({ type }) {
 
             </section>
 
-
             {/* =================================================
                 05 STATISTICS
             ================================================= */}
@@ -2438,7 +2247,6 @@ function AddInstitution({ type }) {
                   05
                 </div>
 
-
                 <div className="lep-form-section-icon">
 
                   <SmartIcon
@@ -2448,13 +2256,11 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
                 <div className="lep-form-section-heading">
 
                   <h2>
                     Institution Statistics
                   </h2>
-
 
                   <p>
                     Verified student and teacher
@@ -2465,9 +2271,7 @@ function AddInstitution({ type }) {
 
               </div>
 
-
               <div className="lep-form-grid">
-
 
                 <div className="lep-field">
 
@@ -2481,7 +2285,6 @@ function AddInstitution({ type }) {
                     Total Students
 
                   </label>
-
 
                   <input
                     name="student_count"
@@ -2497,7 +2300,6 @@ function AddInstitution({ type }) {
 
                 </div>
 
-
                 <div className="lep-field">
 
                   <label>
@@ -2510,7 +2312,6 @@ function AddInstitution({ type }) {
                     Total Teachers
 
                   </label>
-
 
                   <input
                     name="teacher_count"
@@ -2530,13 +2331,11 @@ function AddInstitution({ type }) {
 
             </section>
 
-
             {/* =================================================
                 ACTIONS
             ================================================= */}
 
             <div className="lep-form-actions">
-
 
               <div className="lep-form-actions-note">
 
@@ -2552,7 +2351,6 @@ function AddInstitution({ type }) {
                 </span>
 
               </div>
-
 
               <div className="lep-form-buttons">
 
@@ -2571,7 +2369,6 @@ function AddInstitution({ type }) {
                   Cancel
 
                 </Link>
-
 
                 <button
                   type="submit"
@@ -2608,6 +2405,5 @@ function AddInstitution({ type }) {
     </>
   );
 }
-
 
 export default AddInstitution;

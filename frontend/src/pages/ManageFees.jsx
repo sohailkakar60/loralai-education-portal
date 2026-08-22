@@ -1,4 +1,4 @@
-import {
+﻿import {
   useEffect,
   useMemo,
   useState,
@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function ManageFees() {
@@ -90,7 +91,7 @@ function ManageFees() {
       ] = await Promise.all([
 
         fetch(
-          `http://localhost:5000/api/admin/institutions/${id}`,
+          `${API_URL}/api/admin/institutions/${id}`,
           {
             headers: {
               Authorization:
@@ -100,7 +101,7 @@ function ManageFees() {
         ),
 
         fetch(
-          `http://localhost:5000/api/fees/institution/${id}`
+          `${API_URL}/api/fees/institution/${id}`
         ),
 
       ]);
@@ -269,7 +270,7 @@ function ManageFees() {
 
       const response =
         await fetch(
-          "http://localhost:5000/api/fees",
+          `${API_URL}/api/fees`,
           {
             method: "POST",
 
@@ -401,7 +402,7 @@ function ManageFees() {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/fees/${feeId}`,
+            `${API_URL}/api/fees/${feeId}`,
             {
               method: "DELETE",
 

@@ -4,124 +4,278 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
+import API_URL from "../config/api";
+
+
 function Schools() {
   const [searchParams, setSearchParams] =
     useSearchParams();
 
-  const [schools, setSchools] = useState([]);
 
-  const [search, setSearch] = useState(
-    searchParams.get("search") || ""
-  );
+  const [schools, setSchools] =
+    useState([]);
 
-  const [ownership, setOwnership] = useState(
-    searchParams.get("ownership") || ""
-  );
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [search, setSearch] =
+    useState(
+      searchParams.get("search") || ""
+    );
+
+
+  const [ownership, setOwnership] =
+    useState(
+      searchParams.get("ownership") || ""
+    );
+
+
+  const [loading, setLoading] =
+    useState(true);
+
+
+  const [error, setError] =
+    useState("");
+
+
+  // =========================================================
+  // LOAD SCHOOLS
+  // =========================================================
 
   const loadSchools = async (
     searchValue = search,
     ownershipValue = ownership
   ) => {
+
     try {
+
       setLoading(true);
       setError("");
 
-      const params = new URLSearchParams();
 
-      params.set("type", "school");
-      params.set("limit", "100");
+      const params =
+        new URLSearchParams();
 
-      if (searchValue.trim()) {
+
+      params.set(
+        "type",
+        "school"
+      );
+
+
+      params.set(
+        "limit",
+        "100"
+      );
+
+
+      if (
+        searchValue.trim()
+      ) {
+
         params.set(
           "search",
           searchValue.trim()
         );
+
       }
 
-      if (ownershipValue) {
+
+      if (
+        ownershipValue
+      ) {
+
         params.set(
           "ownership",
           ownershipValue
         );
+
       }
 
-      const response = await fetch(
-        `http://localhost:5000/api/public/institutions?${params.toString()}`
-      );
 
-      const data = await response.json();
+      const response =
+        await fetch(
+          `${API_URL}/api/public/institutions?${params.toString()}`
+        );
 
-      if (!response.ok || !data.success) {
+
+      const data =
+        await response.json();
+
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
+
         throw new Error(
           data.message ||
             "Failed to load schools."
         );
+
       }
 
+
       setSchools(
-        data.data?.institutions || []
+        data.data?.institutions ||
+          []
       );
+
+
     } catch (err) {
+
       console.error(
         "Load schools error:",
         err
       );
+
 
       setError(
         err.message ||
           "Failed to load schools."
       );
 
+
       setSchools([]);
+
     } finally {
+
       setLoading(false);
+
     }
+
   };
 
-  // Load schools whenever URL filters change
+
+  // =========================================================
+  // LOAD WHEN URL FILTERS CHANGE
+  // =========================================================
+
   useEffect(() => {
+
     const urlSearch =
-      searchParams.get("search") || "";
+      searchParams.get(
+        "search"
+      ) || "";
+
 
     const urlOwnership =
-      searchParams.get("ownership") || "";
+      searchParams.get(
+        "ownership"
+      ) || "";
 
-    setSearch(urlSearch);
-    setOwnership(urlOwnership);
+
+    setSearch(
+      urlSearch
+    );
+
+
+    setOwnership(
+      urlOwnership
+    );
+
 
     loadSchools(
       urlSearch,
       urlOwnership
     );
+
   }, [searchParams]);
 
-  const handleSubmit = (event) => {
+
+  // =========================================================
+  // SEARCH
+  // =========================================================
+
+  const handleSubmit = (
+    event
+  ) => {
+
     event.preventDefault();
+
 
     const params = {};
 
-    if (search.trim()) {
-      params.search = search.trim();
+
+    if (
+      search.trim()
+    ) {
+
+      params.search =
+        search.trim();
+
     }
 
-    if (ownership) {
-      params.ownership = ownership;
+
+    if (
+      ownership
+    ) {
+
+      params.ownership =
+        ownership;
+
     }
 
-    setSearchParams(params);
+
+    setSearchParams(
+      params
+    );
+
   };
+
+
+  // =========================================================
+  // CLEAR
+  // =========================================================
 
   const handleClear = () => {
+
     setSearch("");
     setOwnership("");
+
     setSearchParams({});
+
   };
+
+
+  // =========================================================
+  // IMAGE URL HELPER
+  // =========================================================
+
+  const getImageUrl =
+    (imageUrl) => {
+
+      if (!imageUrl) {
+        return "";
+      }
+
+
+      if (
+        imageUrl.startsWith(
+          "http://"
+        ) ||
+        imageUrl.startsWith(
+          "https://"
+        ) ||
+        imageUrl.startsWith(
+          "data:"
+        ) ||
+        imageUrl.startsWith(
+          "blob:"
+        )
+      ) {
+
+        return imageUrl;
+
+      }
+
+
+      return `${API_URL}${imageUrl}`;
+
+    };
+
 
   return (
     <main className="schools-page">
+
 
       {/* =====================================================
           HERO
@@ -135,9 +289,11 @@ function Schools() {
             LORALAI EDUCATION PORTAL
           </span>
 
+
           <h1>
             Schools in Loralai
           </h1>
+
 
           <p>
             Explore verified schools collected and
@@ -158,9 +314,12 @@ function Schools() {
 
         <div className="container">
 
+
           <form
             className="school-search-form"
-            onSubmit={handleSubmit}
+            onSubmit={
+              handleSubmit
+            }
           >
 
             <input
@@ -188,17 +347,21 @@ function Schools() {
                 All Ownership
               </option>
 
+
               <option value="government">
                 Government
               </option>
+
 
               <option value="private">
                 Private
               </option>
 
+
               <option value="semi_government">
                 Semi Government
               </option>
+
 
               <option value="other">
                 Other
@@ -214,39 +377,54 @@ function Schools() {
           </form>
 
 
-          {/* Active filters */}
+          {/* =================================================
+              ACTIVE FILTERS
+          ================================================= */}
 
           {(search || ownership) && (
+
             <div className="school-active-filters">
 
               <span>
                 Filters:
               </span>
 
+
               {search && (
+
                 <span className="school-filter-tag">
                   Search: {search}
                 </span>
+
               )}
 
+
               {ownership && (
+
                 <span className="school-filter-tag">
+
                   {ownership.replaceAll(
                     "_",
                     " "
                   )}
+
                 </span>
+
               )}
+
 
               <button
                 type="button"
-                onClick={handleClear}
+                onClick={
+                  handleClear
+                }
                 className="school-clear-filter"
               >
                 Clear
               </button>
 
             </div>
+
           )}
 
 
@@ -261,6 +439,7 @@ function Schools() {
               <h3>
                 Loading schools...
               </h3>
+
 
               <p>
                 Please wait while we load verified
@@ -277,9 +456,11 @@ function Schools() {
                 Unable to load schools
               </h3>
 
+
               <p>
                 {error}
               </p>
+
 
               <button
                 type="button"
@@ -301,23 +482,30 @@ function Schools() {
                 🔎
               </div>
 
+
               <h3>
                 No approved schools found
               </h3>
+
 
               <p>
                 We couldn't find a published school
                 matching your search.
               </p>
 
+
               {(search || ownership) && (
+
                 <button
                   type="button"
                   className="dashboard-primary-btn"
-                  onClick={handleClear}
+                  onClick={
+                    handleClear
+                  }
                 >
                   View All Schools
                 </button>
+
               )}
 
             </div>
@@ -326,7 +514,9 @@ function Schools() {
 
             <>
 
-              {/* RESULTS HEADER */}
+              {/* =============================================
+                  RESULTS HEADER
+              ============================================= */}
 
               <div className="schools-results-header">
 
@@ -336,11 +526,15 @@ function Schools() {
                     VERIFIED INSTITUTIONS
                   </span>
 
+
                   <h2>
+
                     {schools.length}{" "}
+
                     {schools.length === 1
                       ? "School"
                       : "Schools"}
+
                   </h2>
 
                 </div>
@@ -348,159 +542,190 @@ function Schools() {
               </div>
 
 
-              {/* SCHOOL GRID */}
+              {/* =============================================
+                  SCHOOL GRID
+              ============================================= */}
 
               <div className="schools-grid">
 
-                {schools.map((school) => (
+                {schools.map(
+                  (school) => (
 
-                  <article
-                    key={school.id}
-                    className="school-card"
-                  >
-
-                    {/* IMAGE */}
-
-                    <div className="school-card-image">
-
-                      {school.cover_image_url ? (
-
-                        <img
-                          src={`http://localhost:5000${school.cover_image_url}`}
-                          alt={school.name}
-                        />
-
-                      ) : (
-
-                        <div className="school-card-placeholder">
-                          🏫
-                        </div>
-
-                      )}
-
-                      <span className="verified-badge-public">
-                        ✓ Verified
-                      </span>
-
-                    </div>
+                    <article
+                      key={
+                        school.id
+                      }
+                      className="school-card"
+                    >
 
 
-                    {/* BODY */}
+                      {/* IMAGE */}
 
-                    <div className="school-card-body">
+                      <div className="school-card-image">
 
-                      <span className="school-card-type">
+                        {school.cover_image_url ? (
 
-                        {(
-                          school.ownership_type ||
-                          "private"
-                        )
-                          .replaceAll(
-                            "_",
-                            " "
-                          )
-                          .toUpperCase()}
+                          <img
+                            src={
+                              getImageUrl(
+                                school.cover_image_url
+                              )
+                            }
+                            alt={
+                              school.name
+                            }
+                            onError={(event) => {
+                              event.currentTarget.style.display =
+                                "none";
+                            }}
+                          />
 
-                      </span>
+                        ) : (
 
+                          <div className="school-card-placeholder">
+                            🏫
+                          </div>
 
-                      <h3>
-                        {school.name}
-                      </h3>
-
-
-                      <p className="school-location">
-
-                        📍{" "}
-
-                        {school.area
-                          ? `${school.area}, `
-                          : ""}
-
-                        {school.city}
-
-                        {school.district
-                          ? `, ${school.district}`
-                          : ""}
-
-                      </p>
+                        )}
 
 
-                      <p className="school-description">
-
-                        {school.description ||
-                          "Verified educational institution in Loralai."}
-
-                      </p>
-
-
-                      {/* SCHOOL STATS */}
-
-                      <div className="school-stats">
-
-                        <div>
-
-                          <span>
-                            Students
-                          </span>
-
-                          <strong>
-                            {school.student_count ?? 0}
-                          </strong>
-
-                        </div>
-
-
-                        <div>
-
-                          <span>
-                            Teachers
-                          </span>
-
-                          <strong>
-                            {school.teacher_count ?? 0}
-                          </strong>
-
-                        </div>
-
-                      </div>
-
-
-                      {/* GENDER */}
-
-                      <div className="school-card-extra">
-
-                        <span>
-                          Gender
+                        <span className="verified-badge-public">
+                          ✓ Verified
                         </span>
 
-                        <strong>
-                          {(
-                            school.gender_type ||
-                            "not_specified"
-                          ).replaceAll(
-                            "_",
-                            " "
-                          )}
-                        </strong>
-
                       </div>
 
 
-                      {/* VIEW */}
+                      {/* BODY */}
 
-                      <Link
-                        to={`/schools/${school.slug}`}
-                        className="school-view-btn"
-                      >
-                        View School →
-                      </Link>
+                      <div className="school-card-body">
 
-                    </div>
+                        <span className="school-card-type">
 
-                  </article>
+                          {(
+                            school.ownership_type ||
+                            "private"
+                          )
+                            .replaceAll(
+                              "_",
+                              " "
+                            )
+                            .toUpperCase()}
 
-                ))}
+                        </span>
+
+
+                        <h3>
+                          {school.name}
+                        </h3>
+
+
+                        <p className="school-location">
+
+                          📍{" "}
+
+                          {school.area
+                            ? `${school.area}, `
+                            : ""}
+
+                          {school.city}
+
+                          {school.district
+                            ? `, ${school.district}`
+                            : ""}
+
+                        </p>
+
+
+                        <p className="school-description">
+
+                          {school.description ||
+                            "Verified educational institution in Loralai."}
+
+                        </p>
+
+
+                        {/* SCHOOL STATS */}
+
+                        <div className="school-stats">
+
+                          <div>
+
+                            <span>
+                              Students
+                            </span>
+
+
+                            <strong>
+                              {
+                                school.student_count ??
+                                0
+                              }
+                            </strong>
+
+                          </div>
+
+
+                          <div>
+
+                            <span>
+                              Teachers
+                            </span>
+
+
+                            <strong>
+                              {
+                                school.teacher_count ??
+                                0
+                              }
+                            </strong>
+
+                          </div>
+
+                        </div>
+
+
+                        {/* GENDER */}
+
+                        <div className="school-card-extra">
+
+                          <span>
+                            Gender
+                          </span>
+
+
+                          <strong>
+
+                            {(
+                              school.gender_type ||
+                              "not_specified"
+                            ).replaceAll(
+                              "_",
+                              " "
+                            )}
+
+                          </strong>
+
+                        </div>
+
+
+                        {/* VIEW */}
+
+                        <Link
+                          to={
+                            `/schools/${school.slug}`
+                          }
+                          className="school-view-btn"
+                        >
+                          View School →
+                        </Link>
+
+                      </div>
+
+                    </article>
+
+                  )
+                )}
 
               </div>
 
@@ -515,5 +740,6 @@ function Schools() {
     </main>
   );
 }
+
 
 export default Schools;

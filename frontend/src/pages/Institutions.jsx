@@ -1,17 +1,31 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
+import API_URL from "../config/api";
+
+
 function Institutions({ type }) {
-  const [institutions, setInstitutions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
-  const [ownership, setOwnership] = useState("all");
+  const [institutions, setInstitutions] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  const [search, setSearch] =
+    useState("");
+
+  const [ownership, setOwnership] =
+    useState("all");
+
 
   const config = {
     school: {
       title: "Schools in Loralai",
-      eyebrow: "PRIMARY & SECONDARY EDUCATION",
+      eyebrow:
+        "PRIMARY & SECONDARY EDUCATION",
       description:
         "Explore verified schools and educational institutions in Loralai.",
       singular: "School",
@@ -21,7 +35,8 @@ function Institutions({ type }) {
 
     college: {
       title: "Colleges in Loralai",
-      eyebrow: "HIGHER EDUCATION",
+      eyebrow:
+        "HIGHER EDUCATION",
       description:
         "Explore verified colleges and higher education institutions in Loralai.",
       singular: "College",
@@ -31,7 +46,8 @@ function Institutions({ type }) {
 
     university: {
       title: "Universities in Loralai",
-      eyebrow: "HIGHER EDUCATION",
+      eyebrow:
+        "HIGHER EDUCATION",
       description:
         "Explore verified universities and degree institutions in Loralai.",
       singular: "University",
@@ -41,7 +57,8 @@ function Institutions({ type }) {
 
     academy: {
       title: "Academies in Loralai",
-      eyebrow: "LEARNING CENTERS",
+      eyebrow:
+        "LEARNING CENTERS",
       description:
         "Explore verified academies and learning centers in Loralai.",
       singular: "Academy",
@@ -50,98 +67,138 @@ function Institutions({ type }) {
     },
   };
 
-  const current = config[type] || config.school;
+
+  const current =
+    config[type] ||
+    config.school;
+
 
   // =========================================================
   // LOAD INSTITUTIONS
   // =========================================================
 
   useEffect(() => {
-    const loadInstitutions = async () => {
-      try {
-        setLoading(true);
-        setError("");
+    const loadInstitutions =
+      async () => {
 
-        const response = await fetch(
-          `http://localhost:5000/api/public/institutions?type=${encodeURIComponent(
-            type
-          )}&limit=100`
-        );
+        try {
 
-        const data = await response.json();
+          setLoading(true);
+          setError("");
 
-        if (!response.ok || !data.success) {
-          throw new Error(
-            data.message ||
+          const response =
+            await fetch(
+              `${API_URL}/api/public/institutions?type=${encodeURIComponent(
+                type
+              )}&limit=100`
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (
+            !response.ok ||
+            !data.success
+          ) {
+
+            throw new Error(
+              data.message ||
+                "Failed to load institutions."
+            );
+
+          }
+
+
+          setInstitutions(
+            data.data?.institutions ||
+              []
+          );
+
+        } catch (err) {
+
+          console.error(
+            "Institution loading error:",
+            err
+          );
+
+
+          setError(
+            err.message ||
               "Failed to load institutions."
           );
+
+        } finally {
+
+          setLoading(false);
+
         }
 
-        setInstitutions(
-          data.data?.institutions || []
-        );
-      } catch (err) {
-        console.error(
-          "Institution loading error:",
-          err
-        );
+      };
 
-        setError(
-          err.message ||
-            "Failed to load institutions."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
 
     loadInstitutions();
+
   }, [type]);
+
 
   // =========================================================
   // FILTERING
   // =========================================================
 
-  const filteredInstitutions = useMemo(() => {
-    const query =
-      search.trim().toLowerCase();
+  const filteredInstitutions =
+    useMemo(() => {
 
-    return institutions.filter(
-      (institution) => {
-        const matchesSearch =
-          !query ||
-          institution.name
-            ?.toLowerCase()
-            .includes(query) ||
-          institution.area
-            ?.toLowerCase()
-            .includes(query) ||
-          institution.city
-            ?.toLowerCase()
-            .includes(query) ||
-          institution.district
-            ?.toLowerCase()
-            .includes(query);
+      const query =
+        search
+          .trim()
+          .toLowerCase();
 
-        const matchesOwnership =
-          ownership === "all" ||
-          institution.ownership_type ===
-            ownership;
 
-        return (
-          matchesSearch &&
-          matchesOwnership
-        );
-      }
-    );
-  }, [
-    institutions,
-    search,
-    ownership,
-  ]);
+      return institutions.filter(
+        (institution) => {
+
+          const matchesSearch =
+            !query ||
+            institution.name
+              ?.toLowerCase()
+              .includes(query) ||
+            institution.area
+              ?.toLowerCase()
+              .includes(query) ||
+            institution.city
+              ?.toLowerCase()
+              .includes(query) ||
+            institution.district
+              ?.toLowerCase()
+              .includes(query);
+
+
+          const matchesOwnership =
+            ownership === "all" ||
+            institution.ownership_type ===
+              ownership;
+
+
+          return (
+            matchesSearch &&
+            matchesOwnership
+          );
+
+        }
+      );
+
+    }, [
+      institutions,
+      search,
+      ownership,
+    ]);
+
 
   return (
     <main className="premium-institutions-page">
+
 
       {/* =====================================================
           HERO
@@ -157,6 +214,7 @@ function Institutions({ type }) {
           <div className="premium-institutions-hero-content">
 
             <div className="premium-page-breadcrumb">
+
               <Link to="/">
                 Home
               </Link>
@@ -168,19 +226,24 @@ function Institutions({ type }) {
               <span>
                 {current.singular}s
               </span>
+
             </div>
+
 
             <div className="premium-page-icon">
               {current.icon}
             </div>
 
+
             <span className="premium-page-eyebrow">
               {current.eyebrow}
             </span>
 
+
             <h1>
               {current.title}
             </h1>
+
 
             <p>
               {current.description}{" "}
@@ -193,7 +256,9 @@ function Institutions({ type }) {
           </div>
 
         </div>
+
       </section>
+
 
       {/* =====================================================
           SEARCH / FILTER BAR
@@ -211,6 +276,7 @@ function Institutions({ type }) {
                 ⌕
               </span>
 
+
               <input
                 type="text"
                 value={search}
@@ -224,11 +290,13 @@ function Institutions({ type }) {
 
             </div>
 
+
             <div className="premium-control-select">
 
               <label>
                 OWNERSHIP
               </label>
+
 
               <select
                 value={ownership}
@@ -238,6 +306,7 @@ function Institutions({ type }) {
                   )
                 }
               >
+
                 <option value="all">
                   All Institutions
                 </option>
@@ -257,9 +326,11 @@ function Institutions({ type }) {
                 <option value="other">
                   Other
                 </option>
+
               </select>
 
             </div>
+
 
             <div className="premium-results-count">
 
@@ -267,8 +338,11 @@ function Institutions({ type }) {
                 SHOWING
               </span>
 
+
               <strong>
-                {filteredInstitutions.length}
+                {
+                  filteredInstitutions.length
+                }
               </strong>
 
             </div>
@@ -276,7 +350,9 @@ function Institutions({ type }) {
           </div>
 
         </div>
+
       </section>
+
 
       {/* =====================================================
           RESULTS
@@ -286,6 +362,9 @@ function Institutions({ type }) {
 
         <div className="container">
 
+
+          {/* LOADING */}
+
           {loading && (
 
             <div className="premium-institutions-state">
@@ -294,9 +373,11 @@ function Institutions({ type }) {
                 {current.icon}
               </div>
 
+
               <h3>
                 Loading {current.title}...
               </h3>
+
 
               <p>
                 Please wait while we load verified
@@ -307,25 +388,34 @@ function Institutions({ type }) {
 
           )}
 
-          {!loading && error && (
 
-            <div className="premium-institutions-state premium-state-error">
+          {/* ERROR */}
 
-              <div className="premium-state-symbol">
-                !
+          {!loading &&
+            error && (
+
+              <div className="premium-institutions-state premium-state-error">
+
+                <div className="premium-state-symbol">
+                  !
+                </div>
+
+
+                <h3>
+                  Unable to load institutions
+                </h3>
+
+
+                <p>
+                  {error}
+                </p>
+
               </div>
 
-              <h3>
-                Unable to load institutions
-              </h3>
+            )}
 
-              <p>
-                {error}
-              </p>
 
-            </div>
-
-          )}
+          {/* EMPTY */}
 
           {!loading &&
             !error &&
@@ -337,10 +427,13 @@ function Institutions({ type }) {
                   {current.icon}
                 </div>
 
+
                 <h3>
-                  No {current.singular.toLowerCase()}s
+                  No{" "}
+                  {current.singular.toLowerCase()}s
                   published yet
                 </h3>
+
 
                 <p>
                   Verified institutions will appear
@@ -349,7 +442,10 @@ function Institutions({ type }) {
 
               </div>
 
-          )}
+            )}
+
+
+          {/* NO SEARCH RESULTS */}
 
           {!loading &&
             !error &&
@@ -362,14 +458,17 @@ function Institutions({ type }) {
                   ⌕
                 </div>
 
+
                 <h3>
                   No matching institutions
                 </h3>
+
 
                 <p>
                   Try a different search or ownership
                   filter.
                 </p>
+
 
                 <button
                   type="button"
@@ -384,7 +483,10 @@ function Institutions({ type }) {
 
               </div>
 
-          )}
+            )}
+
+
+          {/* RESULTS */}
 
           {!loading &&
             !error &&
@@ -402,6 +504,7 @@ function Institutions({ type }) {
                       VERIFIED DIRECTORY
                     </span>
 
+
                     <h2>
                       Discover{" "}
                       {current.singular}s
@@ -409,15 +512,21 @@ function Institutions({ type }) {
 
                   </div>
 
+
                   <p>
+
                     {filteredInstitutions.length}{" "}
-                    {filteredInstitutions.length === 1
+
+                    {filteredInstitutions.length ===
+                    1
                       ? current.singular.toLowerCase()
                       : `${current.singular.toLowerCase()}s`}{" "}
                     available
+
                   </p>
 
                 </div>
+
 
                 {/* CARDS */}
 
@@ -427,9 +536,12 @@ function Institutions({ type }) {
                     (institution) => (
 
                       <article
-                        key={institution.id}
+                        key={
+                          institution.id
+                        }
                         className="premium-institution-card"
                       >
+
 
                         {/* IMAGE */}
 
@@ -441,7 +553,16 @@ function Institutions({ type }) {
                           {institution.cover_image_url ? (
 
                             <img
-                              src={`http://localhost:5000${institution.cover_image_url}`}
+                              src={
+                                institution.cover_image_url.startsWith(
+                                  "http://"
+                                ) ||
+                                institution.cover_image_url.startsWith(
+                                  "https://"
+                                )
+                                  ? institution.cover_image_url
+                                  : `${API_URL}${institution.cover_image_url}`
+                              }
                               alt={
                                 institution.name
                               }
@@ -463,11 +584,13 @@ function Institutions({ type }) {
 
                           )}
 
+
                           <span className="premium-verified-badge">
                             ✓ Verified
                           </span>
 
                         </Link>
+
 
                         {/* CARD BODY */}
 
@@ -489,21 +612,28 @@ function Institutions({ type }) {
 
                             </span>
 
+
                             {institution.gender_type && (
+
                               <span className="premium-gender-badge">
+
                                 {institution.gender_type
                                   .replaceAll(
                                     "_",
                                     " "
                                   )}
+
                               </span>
+
                             )}
 
                           </div>
 
+
                           <h3>
                             {institution.name}
                           </h3>
+
 
                           <div className="premium-location">
 
@@ -511,7 +641,9 @@ function Institutions({ type }) {
                               ◉
                             </span>
 
+
                             <p>
+
                               {institution.area
                                 ? `${institution.area}, `
                                 : ""}
@@ -521,9 +653,11 @@ function Institutions({ type }) {
                               {institution.district
                                 ? `, ${institution.district}`
                                 : ""}
+
                             </p>
 
                           </div>
+
 
                           <p className="premium-institution-description">
 
@@ -531,6 +665,7 @@ function Institutions({ type }) {
                               `Verified ${current.singular.toLowerCase()} in Loralai.`}
 
                           </p>
+
 
                           {/* STATS */}
 
@@ -542,12 +677,16 @@ function Institutions({ type }) {
                                 STUDENTS
                               </span>
 
+
                               <strong>
-                                {institution.student_count ??
-                                  0}
+                                {
+                                  institution.student_count ??
+                                  0
+                                }
                               </strong>
 
                             </div>
+
 
                             <div>
 
@@ -555,12 +694,16 @@ function Institutions({ type }) {
                                 TEACHERS
                               </span>
 
+
                               <strong>
-                                {institution.teacher_count ??
-                                  0}
+                                {
+                                  institution.teacher_count ??
+                                  0
+                                }
                               </strong>
 
                             </div>
+
 
                             <div>
 
@@ -568,14 +711,18 @@ function Institutions({ type }) {
                                 EST.
                               </span>
 
+
                               <strong>
-                                {institution.established_year ||
-                                  "—"}
+                                {
+                                  institution.established_year ||
+                                  "—"
+                                }
                               </strong>
 
                             </div>
 
                           </div>
+
 
                           {/* ACTION */}
 
@@ -583,14 +730,17 @@ function Institutions({ type }) {
                             to={`${current.path}/${institution.slug}`}
                             className="premium-institution-view"
                           >
+
                             <span>
                               View{" "}
                               {current.singular}
                             </span>
 
+
                             <strong>
                               →
                             </strong>
+
                           </Link>
 
                         </div>
@@ -604,11 +754,12 @@ function Institutions({ type }) {
 
               </>
 
-          )}
+            )}
 
         </div>
 
       </section>
+
 
       {/* =====================================================
           BOTTOM CTA
@@ -624,9 +775,11 @@ function Institutions({ type }) {
               LORALAI EDUCATION PORTAL
             </span>
 
+
             <h2>
               Looking for something specific?
             </h2>
+
 
             <p>
               Explore other educational categories
@@ -634,6 +787,7 @@ function Institutions({ type }) {
             </p>
 
           </div>
+
 
           <div className="premium-directory-actions">
 
@@ -644,6 +798,7 @@ function Institutions({ type }) {
               Schools
             </Link>
 
+
             <Link
               to="/colleges"
               className="premium-directory-btn light"
@@ -651,12 +806,14 @@ function Institutions({ type }) {
               Colleges
             </Link>
 
+
             <Link
               to="/universities"
               className="premium-directory-btn light"
             >
               Universities
             </Link>
+
 
             <Link
               to="/tutors"
@@ -674,5 +831,6 @@ function Institutions({ type }) {
     </main>
   );
 }
+
 
 export default Institutions;

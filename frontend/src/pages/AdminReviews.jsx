@@ -5,6 +5,7 @@ import {
 } from "react";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function AdminReviews() {
@@ -52,7 +53,7 @@ function AdminReviews() {
 
       const response =
         await fetch(
-          "http://localhost:5000/api/admin/reviews/pending",
+          `${API_URL}/api/admin/reviews/pending`,
           {
             headers: {
               Authorization:
@@ -61,10 +62,8 @@ function AdminReviews() {
           }
         );
 
-
       const data =
         await response.json();
-
 
       if (
         !response.ok ||
@@ -76,13 +75,11 @@ function AdminReviews() {
         );
       }
 
-
       setReviews(
         data.data?.reviews || []
       );
 
     } catch (err) {
-
       console.error(
         "Load reviews error:",
         err
@@ -94,9 +91,7 @@ function AdminReviews() {
       );
 
     } finally {
-
       setLoading(false);
-
     }
   };
 
@@ -114,7 +109,6 @@ function AdminReviews() {
     id,
     action
   ) => {
-
     const confirmed =
       window.confirm(
         action === "approve"
@@ -122,24 +116,19 @@ function AdminReviews() {
           : "Reject this review?"
       );
 
-
     if (!confirmed) {
       return;
     }
 
-
     try {
-
       setActionLoading(id);
       setError("");
       setMessage("");
-
 
       const token =
         localStorage.getItem(
           "authToken"
         );
-
 
       if (!token) {
         throw new Error(
@@ -147,10 +136,9 @@ function AdminReviews() {
         );
       }
 
-
       const response =
         await fetch(
-          `http://localhost:5000/api/admin/reviews/${id}/${action}`,
+          `${API_URL}/api/admin/reviews/${id}/${action}`,
           {
             method: "PUT",
 
@@ -161,10 +149,8 @@ function AdminReviews() {
           }
         );
 
-
       const data =
         await response.json();
-
 
       if (
         !response.ok ||
@@ -176,23 +162,19 @@ function AdminReviews() {
         );
       }
 
-
       setMessage(
         action === "approve"
           ? "Review approved successfully."
           : "Review rejected successfully."
       );
 
-
       await loadReviews();
 
     } catch (err) {
-
       console.error(
         "Review action error:",
         err
       );
-
 
       setError(
         err.message ||
@@ -200,9 +182,7 @@ function AdminReviews() {
       );
 
     } finally {
-
       setActionLoading(null);
-
     }
   };
 
@@ -213,19 +193,15 @@ function AdminReviews() {
 
   const filteredReviews =
     useMemo(() => {
-
       const query =
         search.trim().toLowerCase();
 
-
       return reviews.filter(
         (review) => {
-
           const rating =
             Number(
               review.rating || 0
             );
-
 
           const matchesSearch =
             !query ||
@@ -242,21 +218,17 @@ function AdminReviews() {
               ?.toLowerCase()
               .includes(query);
 
-
           const matchesRating =
             ratingFilter === "all" ||
             rating ===
               Number(ratingFilter);
 
-
           return (
             matchesSearch &&
             matchesRating
           );
-
         }
       );
-
     }, [
       reviews,
       search,
@@ -307,7 +279,6 @@ function AdminReviews() {
   const renderStars = (
     rating
   ) => {
-
     const safeRating =
       Math.min(
         5,
@@ -316,7 +287,6 @@ function AdminReviews() {
           Number(rating || 0)
         )
       );
-
 
     return (
       <span className="lep-review-stars">
@@ -337,7 +307,6 @@ function AdminReviews() {
   return (
     <>
       <style>{styles}</style>
-
 
       <main className="lep-admin-reviews">
 
@@ -820,7 +789,7 @@ function AdminReviews() {
                                   {
                                     Number(
                                       review.rating ||
-                                        0
+                                      0
                                     )
                                   }/5
 
@@ -849,11 +818,9 @@ function AdminReviews() {
                                   "User"
                                 }
 
-
                                 <span>
                                   •
                                 </span>
-
 
                                 <SmartIcon
                                   name="school"

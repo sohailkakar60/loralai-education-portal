@@ -1,8 +1,9 @@
-
+﻿
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import SmartIcon from "../components/SmartIcon";
+import API_URL from "../config/api";
 
 
 function Rankings() {
@@ -32,7 +33,7 @@ function Rankings() {
 
         const response =
           await fetch(
-            "http://localhost:5000/api/public/rankings"
+            `${API_URL}/api/public/rankings`
           );
 
 
@@ -177,10 +178,10 @@ function Rankings() {
 
 
       return (
-        "★".repeat(
+        "â˜…".repeat(
           rounded
         ) +
-        "☆".repeat(
+        "â˜†".repeat(
           5 - rounded
         )
       );
@@ -701,7 +702,7 @@ function Rankings() {
                                     "http"
                                   )
                                     ? school.logo_url
-                                    : `http://localhost:5000${school.logo_url}`
+                                    : `${API_URL}${school.logo_url}`
                                 }
                                 alt={
                                   school.name
